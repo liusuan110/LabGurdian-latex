@@ -1,0 +1,104 @@
+% !TEX program = xelatex
+\documentclass[a4paper, 10pt, fontset=windows]{ctexart}
+
+\usepackage[margin=1.8cm]{geometry}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{array}
+\usepackage{amssymb}
+
+\setlength{\parskip}{4pt}
+\setlength{\parindent}{0pt}
+\pagestyle{empty}
+\setlist{itemsep=1pt, leftmargin=1.5em}
+
+\begin{document}
+
+{\centering\Large\bfseries LabGuardian 数据采集速查\par}
+\vspace{2pt}
+{\centering\small\color{gray} YOLOv8-OBB $\cdot$ 面包板电路元件检测 $\cdot$ 目标 150--200 张\par}
+\vspace{6pt}
+\hrule
+\vspace{6pt}
+
+%% === 1 ===
+\section*{1 \quad 采集目标}
+
+\textbf{5 类元件：}
+\begin{tabular}{@{}cllc@{}}
+\toprule
+ID & 类别 & 说明 & 引脚 \\
+\midrule
+0 & Resistor   & 色环电阻，水平插入，四/五环              & 2 \\
+1 & Transistor & TO-92 三极管，半圆柱体                   & 3 \\
+2 & Capacitor  & 电解电容(立式圆柱) / 陶瓷电容(小片)      & 2 \\
+3 & Wire       & 跳线/杜邦线，多色                        & 2 \\
+4 & Diode      & DO-41 二极管，黑色+银环                   & 2 \\
+\bottomrule
+\end{tabular}
+
+\medskip
+\textbf{6 个实验电路：}
+LED限流、RC滤波、共射极放大、二极管整流、电容滤波、三极管开关(可选)
+
+\medskip
+\textbf{数据量：}
+完整电路 100--120 张 + 单元件特写 20--30 张 + 空面包板 5--10 张 + 干扰场景 10--15 张 = \textbf{150--200 张}
+
+%% === 2 ===
+\section*{2 \quad 拍摄要求}
+
+\begin{itemize}
+  \item \textbf{设备}：手机后置($\geq$1200万像素，关HDR/美颜) + USB摄像头(模拟比赛)，两种都拍
+  \item \textbf{分辨率}：拍最高，后处理缩放到 1280$\times$960 或 1920$\times$1080；格式 JPG
+  \item \textbf{距离}：镜头距面包板 25--40cm，整个面包板在画面内
+  \item \textbf{角度}：正俯拍为主(70\%)，$\pm$15$^\circ$倾斜辅助(30\%)
+  \item \textbf{对焦}：点击面包板中心对焦，元件清晰即可
+  \item \textbf{命名}：\texttt{exp\{编号\}\_\{光照\}\_\{序号\}.jpg}，如 \texttt{exp3\_daylight\_007.jpg}
+\end{itemize}
+
+\textbf{3 种光照（每个电路都要拍）：}
+\begin{tabular}{@{}lll@{}}
+L1 自然光(窗边) & L2 日光灯(教室) & L3 台灯侧光/手电筒(制造阴影)
+\end{tabular}
+
+%% === 3 ===
+\section*{3 \quad 采集流程}
+
+\textbf{准备元件：}
+电阻 2--3 种(1k/10k/100$\Omega$)、三极管 2--3 个(S8050/2N3904)、电解+陶瓷电容各 2--3 个、多色杜邦线(红黑黄蓝绿各2根)、二极管 2--3 个(1N4007)。有不同面包板都拿出来。
+
+\medskip
+\textbf{拍摄矩阵（每个电路）：}
+
+\begin{tabular}{@{}l|ccc|c@{}}
+\toprule
+ & L1 自然光 & L2 日光灯 & L3 侧光 & 小计 \\
+\midrule
+正俯拍 0$^\circ$ & 2 张 & 2 张 & 2 张 & 6 \\
+左偏 15$^\circ$  & 1    & 1    & --   & 2 \\
+右偏 15$^\circ$  & 1    & 1    & --   & 2 \\
+\midrule
+\multicolumn{4}{@{}r|}{每个电路合计} & \textbf{$\sim$10--14} \\
+\bottomrule
+\end{tabular}
+
+\smallskip
+6 个实验 $\times$ 14 张 $\approx$ 84 张核心图像。
+
+\medskip
+\textbf{辅助图像：}
+\begin{itemize}
+  \item 单元件特写(只插1--2个元件) $\sim$20张
+  \item 空面包板(负样本) $\sim$5张
+  \item 干扰(手在插元件、旁边有工具、元件遮挡) $\sim$10张
+  \item "错误"电路(少接线、元件插反) $\sim$5张
+\end{itemize}
+
+\textbf{质检：}删掉模糊、过曝/欠曝、面包板不完整、完全重复的图片。
+
+\vfill
+{\small\color{gray}\hrule\vspace{3pt}\centering LabGuardian $\cdot$ 2026.02\par}
+
+\end{document}

@@ -1,0 +1,9 @@
+# macOS
+.DS_Store
+
+# Typst / LaTeX build artifacts
+*.aux
+*.log
+*.synctex.gz
+*.fls
+*.fdb_latexmk
