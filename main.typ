@@ -4,6 +4,19 @@
 // ============================================================
 
 // ============================================================
+// 字体配置 — 跨平台兼容 (Windows / macOS / Linux)
+// ============================================================
+// Windows: SimSun / SimHei / KaiTi
+// macOS:   Songti SC / Heiti SC / Kaiti SC
+// Linux:   Noto Serif SC / Noto Sans SC
+
+#let 正文字体 = ("Times New Roman", "SimSun", "Songti SC", "Source Han Serif SC")
+#let 标题字体 = ("Times New Roman", "SimHei", "Heiti SC", "Noto Sans SC")
+#let 楷体字体 = ("Times New Roman", "KaiTi", "Kaiti SC", "STKaiti")
+#let 纯楷体 = ("KaiTi", "Kaiti SC", "STKaiti")
+#let 宋体 = ("SimSun", "Songti SC", "Source Han Serif SC")
+
+// ============================================================
 // 全局页面设置
 // ============================================================
 #set page(
@@ -12,18 +25,15 @@
   // 页脚: "第 X 页 共 Y 页"
   footer: context {
     set align(center)
-    set text(size: 10.5pt, font: "SimSun")
+    set text(size: 10.5pt, font: 宋体)
     [第 #counter(page).display() 页 共 #counter(page).final().at(0) 页]
   },
 )
 
-// ============================================================
-// 字体配置
-// ============================================================
 // 正文默认: 五号宋体 (10.5pt), 首行缩进 2 字符, 单倍行距
 #set text(
   size: 10.5pt,
-  font: ("Times New Roman", "SimSun"),
+  font: 正文字体,
   lang: "zh",
   region: "cn",
 )
@@ -43,7 +53,7 @@
   counter(math.equation).update(0)
   counter(figure.where(kind: image)).update(0)
   counter(figure.where(kind: table)).update(0)
-  set text(size: 16pt, font: ("Times New Roman", "SimHei"), weight: "bold")
+  set text(size: 16pt, font: 标题字体, weight: "bold")
   set align(center)
   v(24pt)
   {
@@ -55,7 +65,7 @@
 
 // 二级标题: 黑体四号(14pt), 缩进2格
 #show heading.where(level: 2): it => {
-  set text(size: 14pt, font: ("Times New Roman", "SimHei"), weight: "bold")
+  set text(size: 14pt, font: 标题字体, weight: "bold")
   v(12pt)
   {
     h(2em)
@@ -67,7 +77,7 @@
 
 // 三级标题: 小四宋体(12pt), 缩进2格
 #show heading.where(level: 3): it => {
-  set text(size: 12pt, font: ("Times New Roman", "SimSun"))
+  set text(size: 12pt, font: 正文字体)
   v(6pt)
   {
     h(2em)
@@ -91,7 +101,7 @@
 // 图表标题格式: 五号宋体加粗, 居中
 // ============================================================
 #show figure.caption: it => {
-  set text(size: 10.5pt, font: ("Times New Roman", "SimSun"), weight: "bold")
+  set text(size: 10.5pt, font: 正文字体, weight: "bold")
   it
 }
 
@@ -129,18 +139,18 @@
 #let 二号 = 22pt
 
 // 宋体文字块
-#let songti(body) = text(font: ("Times New Roman", "SimSun"), body)
+#let songti(body) = text(font: 正文字体, body)
 // 黑体文字块
-#let heiti(body) = text(font: ("Times New Roman", "SimHei"), body)
+#let heiti(body) = text(font: 标题字体, body)
 // 楷体文字块
-#let kaiti(body) = text(font: ("Times New Roman", "KaiTi"), body)
+#let kaiti(body) = text(font: 楷体字体, body)
 
 // 关键词命令
 #let keywords(..args) = {
   let kws = args.pos()
   v(6pt)
   set par(first-line-indent: 0em)
-  text(size: 五号, font: ("Times New Roman", "SimSun"))[
+  text(size: 五号, font: 正文字体)[
     *关键词：*#kws.join("，")
   ]
 }
@@ -158,7 +168,7 @@
 #page[
   #set align(center)
   #v(1cm)
-  #text(size: 四号, font: ("Times New Roman", "SimHei"))[
+  #text(size: 四号, font: 标题字体)[
     2026 年英特尔杯大学生电子设计竞赛嵌入式系统专题邀请赛
   ]
   #v(0.3cm)
@@ -170,7 +180,7 @@
     \- Embedded System Design Invitational Contest
   ]
   #v(1.5cm)
-  #text(size: 二号, font: "KaiTi", weight: "bold")[
+  #text(size: 二号, font: 纯楷体, weight: "bold")[
     初选项目设计方案书
   ]
   #v(3cm)
@@ -178,11 +188,11 @@
   // #image("esic_logo.png", width: 4cm)
   // #text(size: 小四, font: "Times New Roman")[Intel Cup Embedded System Design Contest]
   #v(2cm)
-  #text(size: 四号, font: ("Times New Roman", "KaiTi"), weight: "bold")[
+  #text(size: 四号, font: 楷体字体, weight: "bold")[
     项目题目：#underline[#h(1em)LabGuardian：基于边缘AI的智能实验助教系统#h(1em)]
   ]
   #v(2cm)
-  #text(size: 四号, font: ("Times New Roman", "KaiTi"))[
+  #text(size: 四号, font: 楷体字体)[
     #grid(
       columns: (auto, auto),
       column-gutter: 0.5em,
@@ -201,7 +211,7 @@
 
 // 项目题目 — 黑体三号, 居中
 #align(center)[
-  #text(size: 三号, font: ("Times New Roman", "SimHei"), weight: "bold")[
+  #text(size: 三号, font: 标题字体, weight: "bold")[
     LabGuardian：基于边缘AI的智能实验助教系统
   ]
 ]
@@ -210,7 +220,7 @@
 
 // "摘要" 标题 — 黑体三号, 居中
 #align(center)[
-  #text(size: 三号, font: ("Times New Roman", "SimHei"), weight: "bold")[
+  #text(size: 三号, font: 标题字体, weight: "bold")[
     摘要
   ]
 ]
@@ -248,7 +258,7 @@
 // ============================================================
 
 #align(center)[
-  #text(size: 三号, font: ("Times New Roman", "SimHei"), weight: "bold")[
+  #text(size: 三号, font: 标题字体, weight: "bold")[
     目#h(2em)录
   ]
 ]
