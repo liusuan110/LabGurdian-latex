@@ -283,29 +283,30 @@ self.graph.add_edge(node1, node2, component=comp.name, type=comp.type)
 
 \subsection{交互层 (Interaction)}
 \begin{itemize}
-    \item \textbf{本地 LLM}: OpenVINO 优化的 TinyLlama 模型 (保障离线可用与隐私)。
-    \item \textbf{云端 LLM}: 集成 DeepSeek/Moonshot API (处理复杂中文推理)。
+    \item \textbf{本地 LLM}: OpenVINO 优化的模型 (保障全离线可用与隐私)。
+    \item \textbf{规则兜底}: 基于预设模板的离线提示引擎 (极端环境零依赖)。
     \item \textbf{用户界面}: 基于 Python Tkinter 的轻量级 GUI，集成原理图可视化 (\texttt{SchemDraw})。
 \end{itemize}
 
-\subsubsection{AI 模型部署（端侧 + 云端双模）}
+\subsubsection{AI 模型部署（全端侧全离线架构）}
 
-\textbf{1) 端侧（本地）部署：OpenVINO TinyLlama}
+\textbf{1) 端侧（本地）部署}
 \begin{itemize}
-    \item 资源目录：\texttt{openvino\_tinyllama\_model/}
+    \item \textbf{主模型:} OpenVINO 推理引擎优化的本地模型。
+    \item 资源目录：\texttt{openvino\_llm\_model/}
     \item 主程序用绝对路径加载，避免换机器路径出错。
 \end{itemize}
 
 \textbf{源码引用（\texttt{main.py} 节选，展示“本地模型目录配置”）：}
 \begin{lstlisting}[language=Python]
-# main.py: 本地 LLM 路径固定到 src/openvino_tinyllama_model
-LLM_MODEL_PATH = os.path.join(BASE_DIR, "openvino_tinyllama_model")
+# main.py: 本地 LLM 路径固定到 src/openvino_llm_model
+LLM_MODEL_PATH = os.path.join(BASE_DIR, "openvino_llm_model")
 \end{lstlisting}
 
-\textbf{2) 云端增强：OpenAI 兼容 API（如 DeepSeek）}
+\textbf{2) 离线双引擎策略}
 \begin{itemize}
-    \item 适合答辩中文解释与复杂推理；
-    \item 同时保留离线模式，确保课堂/现场在网络不稳定时仍可用。
+    \item NPU / CPU 加速运行大模型，提供强力中文解释与电路推理；
+    \item 结合零依赖规则引擎作兜底保障，100\% 离线运行，符合隐私安全考量。
 \end{itemize}
 
 \textbf{3) 原理图可视化（增强说服力）}
@@ -326,8 +327,8 @@ LLM_MODEL_PATH = os.path.join(BASE_DIR, "openvino_tinyllama_model")
 训练策略（演示关键） & \textbf{预训练 + 小样本微调}（One-Shot Demo Fine-tuning） & 让模型对“演示场景”识别极稳 & 工程化策略：比赛周期内优先保证展示稳定 \\ \hline
 电路建模 & NetworkX & 把“插孔连接关系”做成图，生成网表 & 图论表达连接关系最自然，便于查错/解释 \\ \hline
 原理图绘制 & SchemDraw & 把网表/元件关系画成简化原理图 & 让评审一眼看懂“系统真的理解电路” \\ \hline
-本地大模型 & OpenVINO + Optimum-Intel + Transformers & 离线对话/基础解释 & 展示 Intel 端侧 AI 能力、无网可用 \\ \hline
-云端大模型（可选） & OpenAI 兼容 API（如 DeepSeek） & 复杂中文推理、除错建议更强 & 推理更聪明，适合答辩问答 \\ \hline
+本地大模型 & OpenVINO + INT4 等量化 & 离线对话/基础解释/推理 & 展示 Intel 端侧 AI 能力、无网可用 \\ \hline
+规则兜底引擎 & 知识库匹配与格式化 & 基础查询与通用故障排查 & 防网路故障、模型宕机等极端情况，保证100\%可靠 \\ \hline
 GUI 界面 & Tkinter + Pillow(PIL) & 画面显示、按钮交互、结果展示 & Python 自带/轻量，适合比赛快速交付 \\ \hline
 \end{longtable}
 
@@ -492,19 +493,19 @@ GUI 界面 & Tkinter + Pillow(PIL) & 画面显示、按钮交互、结果展示 
     \end{itemize}
 \end{enumerate}
 
-\section{智能大脑：混合专家系统 (Mixture of Agents)}
-我们采用了\textbf{本地 + 云端}的双模互补策略：
+\section{智能大脑：全离线双引擎推理 (Dual-Engine Offline Inference)}
+我们采用了\textbf{本地大模型 + 规则兜底}的双引擎策略：
 
 \begin{enumerate}
-    \item \textbf{本地模型 (Intel OpenVINO + TinyLlama)}:
+    \item \textbf{本地 NPU 计算模型}:
     \begin{itemize}
-        \item 量化加速 (INT8/FP16)。
-        \item 负责处理简单的电路查询、元件参数读取，并在无网环境下提供基础响应。
+        \item 量化加速 (INT4/INT8)。
+        \item 负责处理各类电路查询、复杂的问答与故障排查，提供与云端大语言模型近似的表现。
     \end{itemize}
-    \item \textbf{云端增强 (DeepSeek API)}:
+    \item \textbf{规则兜底与容错增强}:
     \begin{itemize}
-        \item 当需要进行复杂的电路纠错推理时，系统会将网表发送给云端大模型。
-        \item 结合 Prompt Engineering，让大模型扮演"电子工程专家"。
+        \item 当因 NPU / 环境限制模型偶发不可用时，基于确定的网络连接结构与元器件电气规则，进行故障识别与安全拦截。
+        \item 保证设备无需互联网的条件下始终能"听懂"、"会答"。
     \end{itemize}
 \end{enumerate}
 
@@ -701,15 +702,15 @@ def generate_schematic(self, show=True):
     \item \textbf{摄像头实时模式（展示实时性）}：用摄像头对准面包板，系统实时识别与更新。
 \end{itemize}
 
-\textbf{大模型两种模式}
+\textbf{大模型模式}
 \begin{itemize}
-    \item \textbf{云端模式}：在 \texttt{main.py} 里开启 \texttt{USE\_CLOUD\_LLM = True}。
-    \item \textbf{本地模式}：在 \texttt{main.py} 里关闭 \texttt{USE\_CLOUD\_LLM = False}。
+    \item \textbf{本地 NPU 推理模式}：在 \texttt{main.py} 中默认开启完整体本地 LLM 推理。
+    \item \textbf{规则模式}：应对极端掉电/断网环境，快速反馈预设问题。
 \end{itemize}
 
 \textbf{“演示最关键的一句话”}
 \begin{quote}
-我们现场演示不是靠运气：视觉识别使用 \textbf{YOLOv8-OBB（公开预训练）+ 场景小样本微调（演示稳定化）}，确保对演示电路识别稳定；然后通过 \textbf{坐标映射 + 图论网表} 让系统真正“理解连接关系”，最后由 \textbf{LLM} 输出可解释的排错建议。
+我们现场演示不是靠运气：视觉识别使用 \textbf{YOLOv8-OBB（公开预训练）+ 场景小样本微调（演示稳定化）}，确保对演示电路识别稳定；然后通过 \textbf{坐标映射 + 图论网表} 让系统真正“理解连接关系”，最后由 \textbf{全离线双引擎大模型} 输出可解释的排错建议。
 \end{quote}
 
 
@@ -718,7 +719,7 @@ def generate_schematic(self, show=True):
 
 \subsection{入口与核心逻辑}
 \begin{description}[font=\ttfamily\bfseries, style=nextline, leftmargin=1em]
-    \item[main.py] 项目主入口。负责加载视觉模型、构建电路上下文、调用 LLM（云端或本地）、展示网表、触发校准与原理图绘制。
+    \item[main.py] 项目主入口。负责加载视觉模型、构建电路上下文、调用 LLM（双离线模式）、展示网表、触发校准与原理图绘制。
     \item[calibration.py] 负责相机/图片的面包板校准与坐标映射。实现透视变换、孔洞检测，将像素坐标映射为逻辑孔位 (row/col)。
     \item[circuit\_logic.py] 电路拓扑建模与验证核心。
     \begin{itemize}
