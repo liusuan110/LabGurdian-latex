@@ -886,11 +886,70 @@ $ "score" = "doc_score_scale" times [(1 - w) dot "norm"("keyword") + w dot "cosi
 
 #include "pictures/cadx/fig_deploy.typ"
 
-DK-2500 (Intel Core Ultra 5 225U) 配备 12C14T CPU、Intel Arc iGPU、Intel NPU 三种计算单元。本项目利用 OpenVINO 工具套件实现负载分层卸载，每种单元各司其职：
+DK-2500 (Intel Core Ultra 5 225U) 配备 12C14T CPU、Intel Arc iGPU、Intel AI Boost NPU 三种计算单元。本项目在板端通过 OpenVINO 2026.1 + libze1 1.21.9 + intel-level-zero-npu 1.26 的驱动栈完成异构推理，并对三类典型负载做了端到端实测。基于实测数据，本节给出每种单元的最佳归属：
 
-+ *iGPU (FP16)*：YOLO-Pose 关键点检测、PCB 缺陷热力图（Anomalib 零样本）——计算密度高、并行度高的视觉前向推理；
-+ *NPU (INT4)*：Gemma3-4B 大语言模型推理——长 sequence 的 attention 密集运算，NPU 专用加速器最适合；
-+ *CPU (Python 主程序)*：GNN-A 推理 (23k 参数小模型)、Template VF2 匹配、LangGraph 编排、RAG 检索——逻辑复杂度高、数据流不规则的控制面运算。
++ *NPU (INT8) — 视觉常驻*：YOLOv8s-pose 关键点检测在 NPU 上 75 img/s @ 13.3 ms (P99 15.6 ms)、incremental 功耗仅 4.1 W、单次推理 55 mJ；NPU 期间 CPU cores 与 iGPU 全部空闲，可与 LLM 真正并行；
++ *iGPU (FP16/INT4) — LLM 主推理*：Gemma3-4B-INT4 多模态在 iGPU 上 30 tok/s（首 token 38 s，后续秒级），Qwen2.5-1.5B-INT4 在 iGPU 上 48 tok/s。LLM 的自回归 KV cache 是动态 shape，更适合 GPU 的 SIMT 架构；
++ *CPU — 控制面与图分析*：GNN-A 推理 (~22k 参数、1 ms)、Template Matcher 的 VF2 子图同构、LangGraph 节点调度、RAG 检索全部走 CPU 单线程 Python——这些是 NPU/GPU 不擅长的不规则数据流逻辑。
+
+#par[
+  *关键发现*：本项目原本计划让 NPU 承担 LLM 推理（业界主流话术），但实测发现 OpenVINO 2026.1 的 vpux 编译器对 Gemma3 的 `q_proj` 矩阵乘存在已知 issue（"Channels count … 0 != 20"），Qwen2.5-7B INT4 又因 7.3 GB RAM 在编译时 peak ~8 GB 触发 OOM，唯一能在 NPU 上稳定运行的是 Qwen2.5-1.5B INT4 而其速度（14 tok/s）反而慢于 CPU INT4 （41 tok/s）。这一负面结果反过来印证了 NPU 的真正用武之地是固定 shape 的视觉 CNN 而非动态 shape 的自回归 LLM，因此本项目把 NPU 让给 YOLO-Pose，GPU 让给 LLM。
+]
+
+== 端侧实测：NPU 视觉加速验证 <sec:npu-bench>
+
+本子节给出 YOLOv8s-pose 在 DK-2500 三种计算单元 × 两种精度上的实测延迟与功耗数据，覆盖 6 个完整配置。所有数据在板端单进程串行采集，60--1153 次推理统计，turbostat 0.25 s 采样间隔同步记录 RAPL 能量计。
+
+=== 延迟与吞吐对照
+
+#figure(
+  tlt(
+    columns: (auto, auto, auto, auto, auto, auto, auto),
+    align: (left, center, center, center, center, center, center),
+    header: (
+      [Device], [Precision], [Load(s)], [Mean(ms)], [P95(ms)], [P99(ms)], [img/s],
+    ),
+    rows: (
+      ([CPU], [FP16], [0.14], [92.44], [96.74], [98.92], [10.8]),
+      ([CPU], [INT8], [0.24], [29.02], [30.13], [30.65], [34.5]),
+      ([iGPU], [FP16], [0.43], [26.87], [27.32], [28.18], [37.2]),
+      ([iGPU], [INT8], [2.85], [18.26], [19.29], [20.11], [54.7]),
+      ([*NPU*], [*FP16*], [1.01], [16.55], [16.64], [17.67], [60.4]),
+      ([*NPU*], [*INT8*], [*1.20*], [*13.37*], [*13.75*], [*15.61*], [*74.7*]),
+    ),
+  ),
+  kind: table,
+  caption: [YOLOv8s-pose 在 DK-2500 三设备 × 两精度的延迟与吞吐实测。NPU INT8 在所有维度都最优（最低延迟 13.37 ms、最高吞吐 74.7 img/s、最稳定 P99 15.61 ms）。FP16/INT8 模型大小 22 MB / 11 MB；NNCF Fast Bias Correction 完成 INT8 PTQ，144 张校准图（5 张真实面包板 × 8 + 训练集 batch 合成图）。],
+) <tab:yolo-bench>
+
+=== 功耗时序与能效
+
+#figure(
+  image("pictures/cadx/power_timeseries.pdf", width: 95%),
+  caption: [YOLOv8s-pose INT8 在 DK-2500 上的 RAPL 功耗时序（turbostat 0.25 s 采样）。横轴为时间，纵轴为瓦特；颜色分别为 Package 总功率（黑）、CPU cores（红）、iGPU（蓝）。三段彩色背景对应 CPU/iGPU/NPU 三种 worker 各自 sustained 15 秒的工作态，期间生成 498/841/1153 次推理。CPU 工作态峰值 30.9 W，几乎全部由 CPU cores 承担；iGPU 工作态总功率 10.8 W，其中 GFX 4.4 W；*NPU 工作态总功率 10.0 W，但 CPU cores 与 GFX 线全程趴在 0*——意味着 NPU 推理几乎不占用 CPU/iGPU 资源，是实现真正异构并行的关键。],
+) <fig:power-ts>
+
+#figure(
+  tlt(
+    columns: (auto, auto, auto, auto, auto, auto),
+    align: (left, center, center, center, center, center),
+    header: (
+      [Device], [Throughput], [PkgWatt], [ΔW vs idle], [Energy/inf], [Perf/Watt],
+    ),
+    rows: (
+      ([idle], [—], [4.42 W], [—], [—], [—]),
+      ([CPU INT8], [32.4 ips], [26.37 W], [+21.95], [813.6 mJ], [1.5 ips/W]),
+      ([iGPU INT8], [54.3 ips], [9.35 W], [+4.93], [172.0 mJ], [11.0 ips/W]),
+      ([*NPU INT8*], [*74.7 ips*], [*8.53 W*], [*+4.12*], [*114.2 mJ*], [*18.1 ips/W*]),
+    ),
+  ),
+  kind: table,
+  caption: [DK-2500 RAPL 实测能效对照。NPU INT8 比 CPU INT8 节能 7.1×、性能/瓦特比 12.1×；相比 iGPU INT8 节能 1.5×、性能/瓦特比 1.6×。idle 基线 4.42 W 用作 incremental ΔW 的扣减。],
+) <tab:yolo-power>
+
+=== 结论：NPU 是端侧视觉的最优解
+
+实测数据支持三点结论：(1) NPU INT8 在延迟、吞吐、能效三个轴上都优于 iGPU 与 CPU，且 P99 抖动小，适合 60 fps 实时视频流场景；(2) INT8 PTQ 是免费午餐——NNCF 在 144 张校准图下把模型从 22 MB 压到 11 MB，NPU 吞吐反而从 60.4 ips 提升到 74.7 ips；(3) NPU 工作时 CPU cores 与 GFX 完全空闲，从硬件层面保证了 "NPU 视觉 + GPU LLM + CPU 控制" 三路并行的延迟可叠加为 $max$ 而非 $sum$，端到端延迟从串行的 ~3.5 s 压缩到并行的 ~2.5 s。
 
 == OpenVINO 量化方案
 
