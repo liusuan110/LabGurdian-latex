@@ -28,6 +28,7 @@
     "**/pictures/**/*.bin": true
   },
 
+  // ===== Recommended extensions for this workspace =====
   "extensions.unwantedRecommendations": [
     "nvarner.typst-lsp"
   ]
