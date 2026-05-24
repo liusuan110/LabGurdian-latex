@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "myriad-dreamin.tinymist"
+  ],
+  "unwantedRecommendations": [
+    "nvarner.typst-lsp"
+  ]
+}
