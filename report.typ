@@ -1,13 +1,13 @@
 // ============================================================
 // LabGuardian 毕业论文式项目报告初稿
 // 文件由 ChatGPT 根据 LabGuardian-Server 当前代码结构生成。
-// 编译命令：typst compile graduation_project_report.typ
+// 编译命令：typst compile report.typ
 // ============================================================
 
-#let cn-serif = ("Times New Roman", "SimSun", "Songti SC", "Source Han Serif SC", "Noto Serif CJK SC")
-#let cn-sans = ("Times New Roman", "SimHei", "Heiti SC", "Noto Sans CJK SC", "Source Han Sans SC")
-#let cn-kai = ("Times New Roman", "KaiTi", "Kaiti SC", "STKaiti")
-#let mono = ("Menlo", "Consolas", "Source Han Mono", "Noto Sans Mono CJK SC")
+#let cn-serif = ("Times New Roman", "SimSun")
+#let cn-sans = ("Times New Roman", "SimHei")
+#let cn-kai = ("Times New Roman", "KaiTi")
+#let mono = ("Consolas",)
 
 #let code(body) = text(font: mono, size: 9.5pt)[#body]
 #let term(body) = text(font: cn-sans, weight: "bold")[#body]
@@ -19,7 +19,7 @@
   number-align: center,
 )
 #set text(size: 10.5pt, font: cn-serif, lang: "zh", region: "cn")
-#set par(first-line-indent: 2em, leading: 1em, justify: true)
+#set par(first-line-indent: (amount: 2em, all: true), leading: 1em, justify: true)
 #set heading(numbering: "1.1.1")
 #show heading.where(level: 1): it => {
   v(1.0em)
@@ -58,14 +58,14 @@
     stroke: none,
     row-gutter: 18pt,
     align: (right, left),
-    [项目名称：], [#underline[#h(6.8cm)][LabGuardian 智能电路实验助教系统]],
-    [文档类型：], [#underline[#h(6.8cm)][毕业论文式项目报告初稿]],
-    [代码仓库：], [#underline[#h(6.8cm)][LabGuardian-Server]],
-    [文档仓库：], [#underline[#h(6.8cm)][LabGurdian-latex]],
-    [学生姓名：], [#underline[#h(6.8cm)][]],
-    [指导教师：], [#underline[#h(6.8cm)][]],
-    [所在学院：], [#underline[#h(6.8cm)][]],
-    [提交日期：], [#underline[#h(6.8cm)][2026 年 5 月]],
+    [项目名称：], [#underline[#box(width: 6.8cm)[LabGuardian 智能电路实验助教系统]]],
+    [文档类型：], [#underline[#box(width: 6.8cm)[毕业论文式项目报告初稿]]],
+    [代码仓库：], [#underline[#box(width: 6.8cm)[LabGuardian-Server]]],
+    [文档仓库：], [#underline[#box(width: 6.8cm)[LabGurdian-latex]]],
+    [学生姓名：], [#underline[#box(width: 6.8cm)[]]],
+    [指导教师：], [#underline[#box(width: 6.8cm)[]]],
+    [所在学院：], [#underline[#box(width: 6.8cm)[]]],
+    [提交日期：], [#underline[#box(width: 6.8cm)[2026 年 5 月]]],
   )
 ]
 
@@ -98,11 +98,15 @@ The main contribution of LabGuardian is to transform manual classroom inspection
 
 = 绪论
 
-== 研究背景
+== 研究背景与行业痛点
 
-电路与模拟电子技术实验强调“看得见、连得上、测得准”。学生通常需要在面包板上搭建由电阻、电容、二极管、三极管、运放、计时器等器件构成的基础电路，并通过示波器或万用表观察电压、电流和波形。然而在真实课堂中，实验错误具有明显的现场性和隐蔽性：同一个电路故障可能来自元件缺失、引脚插错、极性接反、电源轨误接、跨孔位短接、信号节点悬空或参考电路选择错误。教师在有限时间内需要同时巡查多个工位，很难持续跟踪每个学生的搭建过程与错误演化。
+高校电子类基础实验包括电路分析、模拟电子技术和数字电子技术等课程，是培养学生工程素养和实践能力的核心环节。学生通常需要在面包板上搭建由电阻、电容、二极管、三极管、运放、计时器等器件构成的基础电路，并通过示波器或万用表观察电压、电流和波形。然而在真实课堂中，实验教学不仅面临 1:30 以上师生比带来的指导压力，也面临物理实操层面的结构性困难：同一个电路故障可能来自元件缺失、引脚插错、极性接反、电源轨误接、跨孔位短接、信号节点悬空或参考电路选择错误。教师在有限时间内需要同时巡查多个工位，很难持续跟踪每个学生的搭建过程与错误演化。
+
+第一，空间遮挡会直接限制电路拓扑提取。真实电路实验中，错综复杂的杜邦线常常遮挡底层元器件与引脚位置，传统纯视觉目标检测算法虽然可以识别电阻、芯片等较大目标，但面对引脚这类尺度小、遮挡强、语义依赖上下文的目标时，容易出现特征丢失、定位偏移和连接关系误判，难以还原真实电气网络。第二，电路逻辑诊断与微观缺陷研判存在门槛。初学者需要把二维原理图映射到三维面包板空间，稍有极性反接、短路或电源轨误接，就可能造成芯片损坏；部分教学场景中相关损坏率可达 8\%--15\%，说明仅靠事后测量和人工巡查难以及时控制风险。第三，当前教学工具多停留在面包板搭建与仿真验证阶段，对后续 PCB 原型设计、焊接制造和检验环节支持不足，难以形成覆盖“原型设计—搭建验证—制造检验”的电子工程教学闭环。
 
 随着边缘人工智能和轻量化视觉模型的发展，实验现场具备了将摄像头、嵌入式算力、规则化电路知识和教学反馈结合起来的条件。LabGuardian 项目正是面向这一需求提出的智能电路实验助教系统。它不是单纯的目标检测系统，也不是单纯的大模型问答系统，而是一个以电气拓扑为核心中间表示的工程系统：视觉模块负责从图像中抽取元件、引脚和孔位；拓扑模块负责把孔位映射为可比较的电气网络；验证模块负责把当前电路与参考电路进行结构化比较；Agent 模块负责把错误证据、知识库和安全提示转化为可理解的教学反馈。
+
+因此，LabGuardian 将学习反馈从“事后纠错”前移至“过程引导”，并进一步面向“面包板原型验证—PCB 成品制造”的全周期教学辅助闭环展开设计。系统借助 PCM（Push-Based Context Management，推送式上下文管理）技能挂载机制和 RAG 芯片知识库，使芯片型号与实验场景能够灵活扩展；新增元器件时，可优先通过导入技术手册补充本地知识，再结合视觉与拓扑模块适配新的诊断任务。全部推理与知识检索在 DK-2500 本地离线完成，可满足实验室弱网环境、数据隐私和现场稳定性要求。项目的主要演示链路可概括为“多模态感知 + 知识增强异构推理 + 教师协同看板”，评审或教师在无额外外网依赖的情况下即可观察从图像输入、拓扑诊断到课堂看板反馈的端到端效果。
 
 == 研究意义
 
@@ -118,7 +122,7 @@ LabGuardian 的研究意义主要体现在三个方面。
 
 从技术路线看，本项目涉及四类相关工作。第一类是电子实验辅助系统，主要关注实验步骤展示、仿真验证和在线题库，但通常缺少对真实面包板搭建状态的实时感知。第二类是目标检测和关键点检测技术，包括 YOLO、OpenCV 和图像几何校准方法，可用于定位元件和引脚。第三类是电路拓扑分析与网表比较技术，可将物理连接关系抽象为节点和边，并通过图匹配、同构和编辑距离判断结构差异。第四类是知识增强诊断系统，包括 RAG、规则引擎、ReAct Agent 和反思校验节点，用于把结构化错误转化为自然语言解释。
 
-LabGuardian 的特点在于组合这些技术，并把“当前电路是否正确”落实到工程可执行的 API 和数据结构中。系统既保留确定性模块，例如孔位映射、图构建、图比较和规则校验；也为可选的智能模块预留接口，例如数据手册检索、本地 VLM、OpenVINO 端侧模型和诊断 Agent。
+LabGuardian 的特点在于组合这些技术，并把“当前电路是否正确”落实到工程可执行的 API 和数据结构中。系统既保留确定性模块，例如孔位映射、图构建、图比较和规则校验；也为可选的智能模块预留接口，例如数据手册检索、本地 VLM、OpenVINO 端侧模型和诊断 Agent。总体来看，当前国内外仍缺少专门面向面包板电路实验场景、同时融合计算机视觉、图论分析与视觉大语言模型的开源 AI 辅助教学系统，这也是 LabGuardian 的主要创新切入点。
 
 = 需求分析
 
