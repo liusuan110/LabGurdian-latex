@@ -107,21 +107,21 @@
 
 = #text("摘要")
 
-#par[#text("LabGuardian 是一套面向高校电子类基础实验的智能实验助教系统。系统以面包板电路搭建、元器件引脚定位、孔位映射、拓扑重构、参考电路比对和诊断解释为主线，针对传统实验教学中教师巡检压力大、学生排错效率低、真实电路遮挡严重、原理图与实物连接映射困难等问题，提出面向真实实验过程的边缘智能辅助方案。系统面向 DK-2500 等边缘计算平台，强调本地化推理、知识检索、异构计算和教学数据隐私保护，并形成了由视觉感知、结构化网表、逻辑比较、PCM Agent、交互界面和硬件遥测组成的完整实验闭环。")]
+#par[#text("LabGuardian 是一套面向高校电子类基础实验的智能实验助教系统。系统以面包板电路搭建、元器件引脚定位、孔位映射、拓扑重构、参考电路比对和诊断解释为主线，针对传统实验教学中教师巡检压力大、学生排错效率低、真实电路遮挡严重、原理图与实物连接映射困难等问题，提出面向真实实验过程的边缘智能辅助方案。系统面向 DK-2500 等边缘计算平台，强调本地化推理、知识检索、异构计算和教学数据隐私保护，并形成了由视觉感知、结构化网表、逻辑比较、诊断智能体、交互界面和硬件遥测组成的完整实验闭环。")]
 
-#par[#text("本报告围绕项目目标、需求分析、总体架构、系统实现、接口数据结构、关键技术、测试验证、部署方案和后续改进方向展开。系统主链路聚焦面包板电路的结构化诊断，采用 S1 组件检测、S1.5 全图引脚姿态检测、S2 孔位映射、S3 拓扑与 netlist_v2 生成、S4 逻辑参考比较、S5 语义分析的事实链；PCM Agent 以结构化证据和确定性工具为基础生成解释，避免将事实判断直接交由大模型完成。PCB AOI、端侧 VLM 微观缺陷识别等能力作为后续扩展方向，不作为本报告已完成主链路的核心内容。")]
+#par[#text("本报告围绕项目目标、需求分析、总体架构、系统实现、接口数据结构、关键技术、测试验证、部署方案和后续改进方向展开。系统主链路聚焦面包板电路的结构化诊断，采用 S1 组件检测、S1.5 全图引脚姿态检测、S2 孔位映射、S3 拓扑与网表生成、S4 逻辑参考比较、S5 语义分析的事实链；诊断智能体以结构化证据和确定性工具为基础生成解释，避免将事实判断直接交由大模型完成。PCB AOI、端侧 VLM 微观缺陷识别等能力作为后续扩展方向，不作为本报告已完成主链路的核心内容。")]
 
-#par(first-line-indent: 0em)[#text("关键词：边缘 AI；电子实验教学；面包板电路；YOLO-Pose；BoardSchema；netlist_v2；图同构比较；PCM Agent；RAG 知识增强；React 交互端。")]
+#par(first-line-indent: 0em)[#text("关键词：边缘 AI；电子实验教学；面包板电路；YOLO-Pose；板型规则；结构化网表；图同构比较；推送式上下文管理；RAG 知识增强；React 交互端。")]
 
 #pagebreak()
 
 = #text("Abstract")
 
-#par[#text("LabGuardian is an intelligent tutoring system for fundamental electronic laboratory courses in higher education. The system focuses on breadboard circuit construction, component pin localization, hole mapping, topology reconstruction, reference circuit comparison, and diagnostic explanation. It addresses practical problems in traditional electronics labs, including heavy teacher inspection workload, low troubleshooting efficiency for students, severe occlusion in real circuit images, and the difficulty of mapping schematics to physical connections. Targeting edge computing platforms such as DK-2500, the system emphasizes local inference, knowledge retrieval, heterogeneous computing, and privacy protection for teaching data. It integrates visual perception, structured netlist representation, logical comparison, PCM Agent, interactive interface, and hardware telemetry into a complete experimental workflow.")]
+#par[#text("LabGuardian is an intelligent tutoring system for fundamental electronic laboratory courses in higher education. The system focuses on breadboard circuit construction, component pin localization, hole mapping, topology reconstruction, reference circuit comparison, and diagnostic explanation. It addresses practical problems in traditional electronics labs, including heavy teacher inspection workload, low troubleshooting efficiency for students, severe occlusion in real circuit images, and the difficulty of mapping schematics to physical connections. Targeting edge computing platforms such as DK-2500, the system emphasizes local inference, knowledge retrieval, heterogeneous computing, and privacy protection for teaching data. It integrates visual perception, structured netlist representation, logical comparison, a diagnostic agent, interactive interface, and hardware telemetry into a complete experimental workflow.")]
 
-#par[#text("This report systematically summarizes the project goals, requirements, overall architecture, system implementation, interface data structures, key technologies, testing and deployment plans, project progress, and future improvement directions. The main workflow focuses on structured diagnosis of breadboard circuits, following the fact chain of S1 component detection, S1.5 full-image pin pose detection, S2 hole mapping, S3 topology and netlist_v2 generation, S4 logical reference comparison, and S5 semantic analysis. The PCM Agent generates explanations based on structured evidence and deterministic tools instead of delegating factual judgment to a large language model. PCB AOI and edge-side VLM micro-defect recognition are treated as future extensions rather than completed core functions.")]
+#par[#text("This report systematically summarizes the project goals, requirements, overall architecture, system implementation, interface data structures, key technologies, testing and deployment plans, project progress, and future improvement directions. The main workflow focuses on structured diagnosis of breadboard circuits, following the fact chain of S1 component detection, S1.5 full-image pin pose detection, S2 hole mapping, S3 topology and netlist generation, S4 logical reference comparison, and S5 semantic analysis. The diagnostic agent generates explanations based on structured evidence and deterministic tools instead of delegating factual judgment to a large language model. PCB AOI and edge-side VLM micro-defect recognition are treated as future extensions rather than completed core functions.")]
 
-#par(first-line-indent: 0em)[#text("Keywords: edge AI; electronic laboratory teaching; breadboard circuit; YOLO-Pose; BoardSchema; netlist_v2; graph isomorphism comparison; PCM Agent; RAG knowledge enhancement; interactive interface.")]
+#par(first-line-indent: 0em)[#text("Keywords: edge AI; electronic laboratory teaching; breadboard circuit; YOLO-Pose; board schema; structured netlist; graph isomorphism comparison; push-based context management; RAG knowledge enhancement; interactive interface.")]
 
 #pagebreak()
 
@@ -131,19 +131,19 @@
 
 #par[#text("LabGuardian 的项目定位是“面向电子实验教学场景的边缘智能助教系统”。与通用电路仿真软件不同，它不是只在虚拟环境中验证电路原理，而是从学生真实搭建的面包板照片出发，将图像中的元件、引脚、孔位和电气连接转换为可验证、可审计的结构化事实，再与教师给出的参考电路进行逻辑比较，最后向学生输出错误位置、错误原因、风险等级和修改建议。系统的核心价值在于把实验教学中的经验性巡检过程数字化、结构化和可解释化，使教师能够从重复排错中解放出来，学生也能在搭建过程中获得及时反馈。")]
 
-#par[#text("系统主线可概括为“component_id + pin_name + hole_id → electrical_node_id → electrical_net_id → netlist_v2”的结构化事实链。该链路把视觉识别结果与电气语义连接起来：component_id 表示识别出的元件实例，pin_name 表示元件具体引脚，hole_id 表示物理面包板孔位，electrical_node_id 表示面包板静态导通节点，electrical_net_id 表示由导线和元件连接合并后的电气网络。只要这条链路可靠，系统就能把“图片中看起来接在某处”的模糊观察转化为“该引脚属于哪个电气网络”的确定性判断。")]
+#par[#text("系统主线可概括为“元件 → 引脚 → 物理孔位 → 导通节点 → 电气网络 → 结构化网表”的逐级事实链。该链路把视觉识别结果与电气语义连接起来：先确定识别出的元件实例，再定位元件的具体引脚，将引脚对应到面包板上的物理孔位，由孔位解析出面包板的静态导通节点，最终把导线和元件的连接合并为统一的电气网络，并固化为结构化网表。只要这条链路可靠，系统就能把“图片中看起来接在某处”的模糊观察，转化为“该引脚究竟属于哪个电气网络”的确定性判断。")]
 
 == #text("1.2 建设目标")
 
 - #text("构建从图像上传、元件识别、引脚检测、孔位映射、拓扑重构到诊断解释的完整实验链路。")
 
-- #text("形成稳定的数据契约，使交互端、服务端、Agent、知识库和测试用例都围绕同一套结构化事实运行。")
+- #text("形成稳定的数据契约，使交互端、服务端、智能体、知识库和测试用例都围绕同一套结构化事实运行。")
 
-- #text("面向电子实验教学输出可解释结果，包括错误码、证据引用、建议动作、风险等级和交互端高亮目标。")
+- #text("面向电子实验教学输出可解释结果，包括错误类型、证据引用、建议动作、风险等级和界面高亮目标。")
 
 - #text("为 DK-2500 等边缘设备部署预留模型路径、运行元数据、硬件遥测和后续 OpenVINO/INT8 优化入口。")
 
-- #text("在系统架构上坚持“事实判断由确定性算法完成，Agent 负责解释与引导”，降低大模型幻觉风险。")
+- #text("在系统架构上坚持“事实判断由确定性算法完成，智能体负责解释与引导”，降低大模型幻觉风险。")
 
 == #text("1.3 报告范围与依据")
 
@@ -165,9 +165,9 @@
 
 #par[#text("第一，真实面包板图像的遮挡问题明显。面包板上导线常常互相交叠，元件本体可能遮住引脚，拍摄角度、反光、阴影和焦距都会影响视觉识别。传统目标检测框只能告诉系统“这里可能有一个元件”，但难以准确给出引脚插入了哪个孔位。对于电子诊断而言，元件框级别的识别远远不够，系统必须进入引脚级和孔位级。")]
 
-#par[#text("第二，学生对面包板静态导通关系不熟悉。面包板主区域通常按行导通，左右半区又被中缝隔开，电源轨还可能存在分段。学生可能认为两个孔在图像上很近就等价，或者忽视 A-E 与 F-J 的隔离关系。系统如果能把 hole_id 映射为 electrical_node_id，就可以明确告诉学生“当前位置虽然相邻，但不在同一导通节点”或“这两个引脚实际上落在了同一网络，存在短路风险”。")]
+#par[#text("第二，学生对面包板静态导通关系不熟悉。面包板主区域通常按行导通，左右半区又被中缝隔开，电源轨还可能存在分段。学生可能认为两个孔在图像上很近就等价，或者忽视 A-E 与 F-J 的隔离关系。系统如果能把物理孔位映射为导通节点，就可以明确告诉学生“当前位置虽然相邻，但不在同一导通节点”或“这两个引脚实际上落在了同一网络，存在短路风险”。")]
 
-#par[#text("第三，教师需要可解释证据而不是黑盒结论。实验教学场景中的 AI 诊断不能只输出“电路错误”四个字，而应说明错误码、涉及的元件、引脚、孔位、参考连接、当前连接以及建议动作。LabGuardian 当前的 validator_report_v2 就围绕这一点设计，它在每条诊断项中保留 evidence_refs，并且可被交互端转换为框选元件、点亮引脚、标注孔位的高亮协议。")]
+#par[#text("第三，教师需要可解释证据而不是黑盒结论。实验教学场景中的 AI 诊断不能只输出“电路错误”四个字，而应说明错误类型、涉及的元件、引脚、孔位、参考连接、当前连接以及建议动作。LabGuardian 当前的诊断报告正是围绕这一点设计：每条诊断项都保留对应的证据引用，并且可被交互端转换为框选元件、点亮引脚、标注孔位的高亮指令。")]
 
 #par[#text("第四，系统需要适应边缘环境。高校实验室网络条件并不总是稳定，课堂图像和学生实验数据也不宜全部上传云端。项目选择边缘设备作为主要运行平台，既能降低依赖外部网络的风险，也有利于现场教学和验收展示。系统统一了模型目录、推理参数和运行元数据记录方式，为后续 DK-2500 真机部署和性能评测提供基础。")]
 
@@ -182,12 +182,12 @@
   [#text("系统响应")],
   [#text("学生")],
   [#text("快速知道电路哪里错、为什么错、如何改；能上传图片并看到可视化定位")],
-  [#text("交互端上传图片，显示识别框、孔位、网表、诊断卡片和 Agent 建议")],
+  [#text("交互端上传图片，显示识别框、孔位、网表、诊断卡片和智能体建议")],
   [#text("教师/助教")],
   [#text("了解多个实验台状态，定位共性错误，减少重复巡检")],
-  [#text("服务端维护 ClassroomState，记录工位风险、诊断、网表和缩略图，支持教师看板扩展")],
+  [#text("服务端维护课堂状态，记录工位风险、诊断、网表和缩略图，支持教师看板扩展")],
   [#text("系统维护者")],
-  [#text("保持视觉、拓扑、比较和 Agent 模块的数据契约稳定，便于后续维护与扩展")],
+  [#text("保持视觉、拓扑、比较和智能体模块的数据契约稳定，便于后续维护与扩展")],
   [#text("通过结构化接口、测试样例和版本记录约束各阶段输入输出")],
   [#text("评审/验收人员")],
   [#text("关注端到端链路、边缘部署价值、可解释诊断和系统完整性")],
@@ -196,25 +196,25 @@
 
 == #text("2.4 功能需求")
 
-- #text("图像接入：支持上传 1 至 3 张 base64 编码的面包板图片，当前交互端默认上传一张主视角图片，服务端协议可扩展多视角。")
+- #text("图像接入：支持上传 1 至 3 张面包板图片，当前交互端默认上传一张主视角图片，服务端协议可扩展多视角。")
 
-- #text("组件检测：识别电阻、电容、导线、LED、二极管、三极管、电位器、IC 等教学常见元件，生成全局 component_id。")
+- #text("组件检测：识别电阻、电容、导线、发光二极管、二极管、三极管、电位器、集成芯片等教学常见元件，并为每个元件生成全局唯一编号。")
 
-- #text("引脚检测：通过全图 YOLO-Pose 或几何规则输出 ordered pins，并保留多视图观测、置信度和来源信息。")
+- #text("引脚检测：通过整图 YOLO-Pose 或几何规则输出有序引脚，并保留多视图观测、置信度和来源信息。")
 
-- #text("孔位映射：将引脚关键点吸附到面包板 hole_id，并进一步映射到 electrical_node_id。")
+- #text("孔位映射：将引脚关键点吸附到面包板物理孔位，并进一步映射到电气导通节点。")
 
-- #text("拓扑重构：基于 BoardSchema 和 CircuitAnalyzer 合并导线网络，输出 netlist_v2、拓扑图和 SPICE 网表。")
+- #text("拓扑重构：基于板型规则和电路分析器合并导线网络，输出结构化网表、拓扑图和 SPICE 网表。")
 
-- #text("参考比较：将当前 netlist_v2 与 logical_reference_v1 参考电路转换为图模型，执行拓扑匹配、角色推断和差异报告。")
+- #text("参考比较：将当前网表与逻辑参考电路转换为图模型，执行拓扑匹配、角色推断并生成差异报告。")
 
-- #text("诊断解释：把 validator_report_v2、RuntimeEvidence、ContextPack 和工具结果转化为学生可理解的自然语言建议。")
+- #text("诊断解释：把诊断报告、运行证据、上下文包和工具结果转化为学生可理解的自然语言建议。")
 
-- #text("人工修正：交互端支持端口标注、孔位修正、网络角色指定、IC 标注和引脚极性选择，提交后重跑 S3/S4。")
+- #text("人工修正：交互端支持端口标注、孔位修正、网络角色指定、集成芯片标注和引脚极性选择，提交后重新执行拓扑重构与参考比较（S3、S4）。")
 
-- #text("可视化：交互端显示阶段进度、元件框、引脚点、孔位高亮、网表表格、诊断项和原始 JSON。")
+- #text("可视化：交互端显示阶段进度、元件框、引脚点、孔位高亮、网表表格、诊断项和原始结构化数据。")
 
-- #text("运行观测：服务端支持 runtime_metadata，并提供 CPU、内存、iGPU、NPU 相关硬件遥测协议。")
+- #text("运行观测：服务端记录运行元数据，并提供 CPU、内存、iGPU、NPU 相关的硬件遥测协议。")
 
 == #text("2.5 非功能需求")
 
@@ -226,9 +226,9 @@
 
 == #text("3.1 总体架构")
 
-#par[#text("LabGuardian 采用交互端与服务端分离的系统架构。交互端负责图片上传、参数选择、参考电路选择、结果可视化、人工修正和 Agent 对话；服务端负责接口接入、图像处理、模型推理、孔位映射、拓扑构建、逻辑比较、课堂状态、知识检索、Agent 编排和遥测推流。整体架构可以概括为“Web 交互层—API 服务层—Pipeline 事实层—Domain 规则层—Agent/Knowledge 解释层—Infra 支撑层”。")]
+#par[#text("LabGuardian 采用交互端与服务端分离的系统架构。交互端负责图片上传、参数选择、参考电路选择、结果可视化、人工修正和智能体对话；服务端负责接口接入、图像处理、模型推理、孔位映射、拓扑构建、逻辑比较、课堂状态、知识检索、智能体编排和遥测推流。整体架构可以概括为“交互层—接口服务层—流水线事实层—领域规则层—智能体与知识解释层—基础支撑层”。")]
 
-#par[#text("系统服务端可划分为 FastAPI/WebSocket API、Services、Agent/Knowledge、Domain、Pipeline 和 Infra 六层。API 层作为协议入口，不承担领域推理；Services 层负责编排、审计、下发和任务管理；Domain 层承载 BoardSchema、CircuitAnalyzer、validator、risk、reference DSL 等稳定规则；Pipeline 层只输出结构化事实，不直接生成教学话术；Agent/Knowledge 层在事实基础上组织上下文、工具调用和回答；Infra 层提供异步任务、缓存、容器化和测试支撑。")]
+#par[#text("系统服务端可划分为接口层、服务层、智能体与知识层、领域层、流水线层和基础设施层六层。接口层作为协议入口，不承担领域推理；服务层负责编排、审计、下发和任务管理；领域层承载板型规则、电路分析、验证、风险评估、参考电路描述等稳定规则；流水线层只输出结构化事实，不直接生成教学话术；智能体与知识层在事实基础上组织上下文、工具调用和回答；基础设施层提供异步任务、缓存、容器化和测试支撑。")]
 
 #table(
   columns: (1fr, 1fr, 1fr),
@@ -237,31 +237,31 @@
   [#text("层级")],
   [#text("主要模块")],
   [#text("职责说明")],
-  [#text("Web 交互层")],
-  [#text("React、Vite、TypeScript、结果画布、网表视图、Agent 对话")],
-  [#text("完成图片上传、参数配置、结果展示、人工修正、Agent 交互和流程编排")],
-  [#text("API 层")],
-  [#text("Pipeline 接口、Agent 接口、课堂状态接口、WebSocket 与遥测接口")],
-  [#text("提供同步/异步 Pipeline、Agent 问答、课堂状态、遥测推流等接口")],
+  [#text("交互层")],
+  [#text("React、Vite、TypeScript、结果画布、网表视图、智能体对话")],
+  [#text("完成图片上传、参数配置、结果展示、人工修正、智能体交互和流程编排")],
+  [#text("接口层")],
+  [#text("流水线接口、智能体接口、课堂状态接口、WebSocket 与遥测接口")],
+  [#text("提供同步与异步流水线、智能体问答、课堂状态、遥测推流等接口")],
   [#text("服务层")],
-  [#text("流水线服务、指导服务、课堂状态、参考电路服务、Agent 服务")],
+  [#text("流水线服务、指导服务、课堂状态、参考电路服务、智能体服务")],
   [#text("负责业务编排、结果封装、参考电路解析、课堂态同步和任务状态管理")],
-  [#text("Pipeline 层")],
+  [#text("流水线层")],
   [#text("流程编排、组件检测、引脚检测、孔位映射、拓扑重构、参考验证、语义分析")],
   [#text("从图像输入到诊断事实输出的主链路")],
-  [#text("Domain 层")],
+  [#text("领域层")],
   [#text("板型规则、电路分析、网表模型、逻辑参考、图比较、风险分类")],
   [#text("提供板型、电气网络、参考电路、图比较和风险分类等确定性规则")],
-  [#text("Agent/Knowledge 层")],
-  [#text("运行证据、上下文包、确定性工具、状态机、回答验证、芯片/电路/故障知识库")],
+  [#text("智能体与知识层")],
+  [#text("运行证据、上下文包、确定性工具、状态机、回答验证、芯片与电路与故障知识库")],
   [#text("把结构化事实转化为可控上下文和教学解释")],
 )
 
 == #text("3.2 主业务流程")
 
-#par[#text("一次完整诊断流程从交互端上传图片开始。用户选择参考电路、设定置信度、IoU、推理尺寸和电源轨角色后，交互端将图片转为纯 base64 字符串，提交到 POST /api/v1/pipeline/run。服务端 PipelineService 解析 reference_id 或 inline reference_circuit，调用 orchestrator 执行 S1 到 S5。执行完成后，服务层将结果封装为 PipelineResult，同时同步到 ClassroomState。交互端接收结果后显示识别事实链和诊断报告，并自动向 Agent 提交“根据当前诊断结果给出诊断解释和下一步建议”的提示，Agent 再基于 ClassroomState 中的 RuntimeEvidence 生成自然语言解释。")]
+#par[#text("一次完整诊断流程从交互端上传图片开始。用户选择参考电路、设定置信度、交并比、推理尺寸和电源轨角色后，交互端将图片编码后提交到同步诊断接口。服务端的流水线服务解析参考电路编号或内联参考电路，调用编排器执行 S1 至 S5。执行完成后，服务层将结果封装为统一的诊断结果，同时同步到课堂状态。交互端接收结果后显示识别事实链和诊断报告，并自动向智能体提交“根据当前诊断结果给出诊断解释和下一步建议”的请求，智能体再基于课堂状态中的运行证据生成自然语言解释。")]
 
-#par[#text("如果学生或教师发现视觉映射结果不准确，交互端可以进入网表模式进行人工修正。用户可以修正引脚孔位，给输入/输出端口打标，设置网络角色，或补充三极管和 IC 的人工标注。交互端随后调用 /api/v1/pipeline/recompute-corrected，把 mapping components 与修正 patch 提交给服务端。服务端不再重跑视觉检测，而是从修正后的 components 重新执行 S3 拓扑、S4 验证和 S5 语义分析。这种设计兼顾 AI 自动识别与教学现场的人机协同，避免视觉阶段偶发错误导致整个系统不可用。")]
+#par[#text("如果学生或教师发现视觉映射结果不准确，交互端可以进入网表模式进行人工修正。用户可以修正引脚孔位，为输入/输出端口打标，设置网络角色，或补充三极管和集成芯片的人工标注。交互端随后调用人工修正重算接口，把映射阶段的元件与修正信息一并提交给服务端。服务端不再重跑视觉检测，而是从修正后的元件重新执行 S3 拓扑重构、S4 验证和 S5 语义分析。这种设计兼顾 AI 自动识别与教学现场的人机协同，避免视觉阶段偶发错误导致整个系统不可用。")]
 
 == #text("3.3 技术选型")
 
@@ -282,22 +282,22 @@
   [#text("Ultralytics YOLO-Detect、YOLO-Pose、OpenCV")],
   [#text("覆盖元件检测和引脚关键点检测，便于训练和部署")],
   [#text("拓扑建模")],
-  [#text("NetworkX、Union-Find、BoardSchema")],
+  [#text("NetworkX、并查集、板型规则模型")],
   [#text("适合构建二分图、合并导通网络、输出可解释网表")],
-  [#text("知识/Agent")],
-  [#text("PCM ContextPack、deterministic tools、LangGraph、Datasheet/Circuit KB")],
+  [#text("知识与智能体")],
+  [#text("上下文管理、确定性工具、LangGraph、器件手册与电路知识库")],
   [#text("把事实、工具、回答分层，降低大模型幻觉风险")],
   [#text("交互端")],
   [#text("React 19、Vite、TypeScript、lucide-react")],
   [#text("适合构建交互式单页应用和课堂看板")],
   [#text("边缘部署")],
-  [#text("Docker、OpenVINO/GenAI 预留、runtime_metadata、telemetry")],
+  [#text("Docker、OpenVINO/GenAI（预留）、运行元数据、遥测")],
   [#text("为 DK-2500 本地推理和性能评测做准备")],
 )
 
 == #text("3.4 设计原则")
 
-#par[#text("系统设计遵循四项原则。第一，事实链优先。视觉模型只产生候选事实，最终教学结论必须经过 BoardSchema、拓扑分析和 validator 约束。第二，接口契约优先。S1、S1.5、S2、netlist_v2、validator_report_v2、RuntimeEvidence 和 ContextPack 都以结构化 schema 作为协作边界，避免交互端、服务端或 Agent 私自猜测。第三，人机协同优先。系统允许人工端口标注和孔位修正，教师与学生可以把 AI 输出修正为可信事实后再重算。第四，边缘可观测优先。运行结果保留模型路径、推理参数、板型 schema、版本号和阶段耗时，后续可与遥测数据一起用于验收展示和实验分析。")]
+#par[#text("系统设计遵循四项原则。第一，事实链优先。视觉模型只产生候选事实，最终教学结论必须经过板型规则、拓扑分析和验证模块约束。第二，接口契约优先。各阶段（S1、S1.5、S2 等）的输出，以及结构化网表、诊断报告、运行证据和上下文包，都以统一的结构化格式作为协作边界，避免交互端、服务端或智能体私自猜测。第三，人机协同优先。系统允许人工端口标注和孔位修正，教师与学生可以把 AI 输出修正为可信事实后再重算。第四，边缘可观测优先。运行结果保留模型路径、推理参数、板型定义、版本号和阶段耗时，后续可与遥测数据一起用于验收展示和实验分析。")]
 
 #pagebreak()
 
@@ -305,7 +305,7 @@
 
 == #text("4.1 服务端模块与职责划分")
 
-#par[#text("服务端按照接口接入、基础配置、智能诊断、领域规则、视觉流水线、数据模型、业务服务和异步任务等模块组织。接口模块负责接收 Pipeline、Agent、课堂状态和遥测请求；基础模块负责运行配置、依赖管理和异步任务；领域模块承载电气拓扑、板型规则、参考电路、比较器和风险规则；流水线模块负责从视觉输入到验证诊断的阶段化处理；业务服务模块负责结果封装、课堂状态同步和任务调度。各模块通过结构化数据契约连接，以降低模块耦合并提高后续维护性。")]
+#par[#text("服务端按照接口接入、基础配置、智能诊断、领域规则、视觉流水线、数据模型、业务服务和异步任务等模块组织。接口模块负责接收诊断流水线、智能体、课堂状态和遥测请求；基础模块负责运行配置、依赖管理和异步任务；领域模块承载电气拓扑、板型规则、参考电路、比较器和风险规则；流水线模块负责从视觉输入到验证诊断的阶段化处理；业务服务模块负责结果封装、课堂状态同步和任务调度。各模块通过结构化数据契约连接，以降低模块耦合并提高后续维护性。")]
 
 #table(
   columns: (1fr, 1fr, 1fr),
@@ -314,95 +314,95 @@
   [#text("模块")],
   [#text("作用")],
   [#text("报告中对应内容")],
-  [#text("Pipeline 编排模块")],
-  [#text("串联 S1→S1.5→S2→S3→S4→S5，管理共享模型和进度回调")],
-  [#text("Pipeline 主流程")],
+  [#text("流水线编排模块")],
+  [#text("串联组件检测、引脚检测、孔位映射、拓扑重构、参考验证和语义分析六个阶段（S1 至 S5），并管理共享模型与进度回调")],
+  [#text("诊断主流程")],
   [#text("组件检测模块")],
-  [#text("组件检测，top 主实例，side 候选补召回")],
+  [#text("识别元件实例，以主视图建立主实例、侧视图补充候选")],
   [#text("视觉组件检测")],
   [#text("引脚检测模块")],
-  [#text("全图 YOLO-Pose 引脚检测，关联回组件")],
+  [#text("基于整图 YOLO-Pose 检测引脚关键点并关联回对应元件")],
   [#text("引脚关键点识别")],
   [#text("孔位映射模块")],
-  [#text("关键点到 hole_id/electrical_node_id 的映射和多视图投票")],
+  [#text("将引脚关键点映射到面包板孔位与导通节点，并进行多视图投票")],
   [#text("孔位映射")],
   [#text("电气拓扑模块")],
-  [#text("CircuitAnalyzer、Union-Find、电气网络、SPICE/netlist 导出")],
+  [#text("构建电路图模型、合并等电位网络，导出网表与 SPICE 网表")],
   [#text("拓扑重构")],
   [#text("参考验证模块")],
-  [#text("logical_reference_v1 比较和 validator_report_v2 输出")],
+  [#text("将当前电路与逻辑参考电路比较并输出诊断报告")],
   [#text("验证诊断")],
   [#text("上下文构建模块")],
-  [#text("错误族路由、工具白名单、上下文包和指标估算")],
-  [#text("PCM Agent")],
-  [#text("Agent 编排模块")],
-  [#text("ReAct + Self-Reflection 状态机与顺序 fallback")],
-  [#text("Agent 编排")],
+  [#text("按错误类型路由、限定可用工具，生成最小上下文并估算规模")],
+  [#text("诊断智能体")],
+  [#text("智能体编排模块")],
+  [#text("组织推理—行动—反思循环与回答验证，并保留顺序降级")],
+  [#text("智能体编排")],
 )
 
-== #text("4.2 Pipeline 编排")
+== #text("4.2 流水线编排")
 
-#par[#text("Pipeline Orchestrator 是服务端事实链的核心。它通过线程安全单例复用 ComponentDetector 和 PinRoiDetector，避免 Celery worker 或同步请求每次都重新加载模型；同时为每次请求创建独立 BreadboardCalibrator，因为校准器包含当前图片的网格状态，不能跨请求共享。run_pipeline 接收 images_b64、reference_circuit、rail_assignments、port_annotations、net_role_assignments、net_alias_assignments、net_merge_assignments 以及 conf、iou、imgsz 等参数，依次执行检测、引脚检测、映射、拓扑、验证和语义分析，并返回 stages、total_duration_ms 与 runtime_metadata。")]
+#par[#text("流水线编排器是服务端事实链的核心。它以线程安全的单例方式复用组件检测器与引脚检测器，避免异步任务或同步请求每次都重新加载模型；同时为每次请求单独创建面包板校准器，因为校准器保存了当前图片的网格状态，不能跨请求共享。编排器接收输入图片、参考电路、电源轨指定、端口标注、网络角色与别名设置，以及置信度阈值、交并比阈值和推理尺寸等参数，依次执行组件检测、引脚检测、孔位映射、拓扑重构、参考验证和语义分析，并返回各阶段结果、总耗时与运行元数据。")]
 
-#par[#text("默认电源轨配置体现出运放实验场景需求：top_plus 为 VCC，top_minus 为 VEE，bot_plus 与 bot_minus 为 GND；用户可以在请求中覆盖这些设置。S3 后系统会应用端口和网络角色标注，并通过 normalize_current_netlist 添加逻辑名、别名和合并信息。S4 使用修正后的 netlist_v2 进行参考比较。运行结束时，runtime_metadata 会记录系统版本、模型版本、知识库版本、规则版本、模型目录、模型路径、设备、置信度、IoU、推理尺寸和板型参数，为后续性能评估和问题追溯提供依据。")]
+#par[#text("默认电源轨配置贴合运放实验场景：上侧两条轨分别作为正电源和负电源，下侧两条轨作为地；用户可在请求中覆盖这些设置。拓扑重构完成后，系统会应用端口和网络角色标注，对网表补充逻辑名称、别名与合并信息，再据此进行参考比较。运行结束时，运行元数据会记录系统、模型、知识库与规则的各项版本，以及模型路径、运行设备、置信度阈值、交并比阈值、推理尺寸和板型参数，为后续性能评估和问题追溯提供依据。")]
 
 == #text("4.3 S1：组件检测")
 
-#par[#text("S1 阶段输入 1 至 3 张 base64 JPEG 图片，输出 top 主实例和 side 补召回候选。系统采用主视图优先策略：top 视图负责建立全局 component_id，侧视图只负责 supplemental_detections，不直接进入主实例列表。这一设计能够避免多视角下同一元件实例融合时出现重复或错配；先用 top 建立主事实，再把 side 作为候选证据，可以降低误合并风险。")]
+#par[#text("S1 阶段输入 1 至 3 张面包板图片，输出主视图的元件主实例和侧视图的补充候选。系统采用主视图优先策略：主视图负责建立全局唯一的元件编号，侧视图只贡献补充检测结果，不直接进入主实例列表。这样可以避免多视角下同一元件被重复识别或错误匹配；先用主视图建立主事实，再把侧视图作为候选证据，能够降低误合并风险。")]
 
-#par[#text("组件检测返回 component_detect_v1 格式结果，记录检测器类型、契约版本、主检测结果、补召回结果、图像尺寸、解码统计和阶段耗时等信息。每个检测项包含元件编号、元件类别、封装类型、引脚模型、置信度、边界框、方向、视角编号、导线颜色和兼容字段等。系统会过滤 Breadboard、Line_area 等背景类，并对暂不支持的类别显式记录，避免“模型有输出但下游无结果”的问题被静默掩盖。对于 IC 元件，S1 还会通过封装识别逻辑推断 DIP8、DIP14 等 package 信息，为后续引脚生成提供依据。")]
+#par[#text("组件检测的输出采用统一的结构化格式，记录检测器类型、契约版本、主检测与补充检测结果、图像尺寸、解码统计和阶段耗时等信息。每个检测项包含元件编号、元件类别、封装类型、引脚模型、置信度、边界框、方向、视角编号和导线颜色等字段。系统会过滤面包板本体、布线区域等背景类别，并对暂不支持的类别显式记录，避免“模型有输出但下游无结果”的问题被静默掩盖。对于集成芯片，S1 还会通过封装识别推断双列直插 8 脚、14 脚等封装信息，为后续引脚生成提供依据。")]
 
 == #text("4.4 S1.5：全图引脚检测")
 
-#par[#text("S1.5 阶段是从元件框级识别进入引脚级事实的关键。当前正式主路径不再对单个组件裁剪 ROI 后分别识别引脚，而是对 top 整图执行 full-image YOLO-Pose，再根据类别和 bbox 几何关系将 pose 实例关联回 S1 组件。这种方式能减少 ROI 裁剪误差和局部上下文丢失，也更符合未来多视角融合的证据整理需求。")]
+#par[#text("S1.5 阶段是从元件框级识别进入引脚级事实的关键。当前主路径不再先裁剪单个元件区域再分别识别引脚，而是对主视图整图执行 YOLO-Pose 关键点检测，再根据类别和边界框的几何关系，将检测到的引脚关联回对应元件。这种方式能减少裁剪误差和局部上下文丢失，也更契合未来多视角融合的证据整理需求。")]
 
-#par[#text("引脚检测阶段会先判断 top 图像是否可用、引脚检测方式是否为 yolo_pose、模型是否已加载。满足条件时进入 full_image_model 路径，输出 component_pin_detect_v1；否则输出 schema-compatible 的 unavailable 外壳，保证下游阶段不会因为模型缺失而结构崩溃。对于 IC 元件，系统可以不完全依赖引脚模型，而是根据 bbox 与面包板行列约束生成 8 或 14 个引脚，再交给 S2 完成最终 hole_id 映射。每个 pin 记录 pin_id、pin_name、keypoints_by_view、visibility_by_view、score_by_view、source_by_view、confidence、source 和 metadata，为 S2 提供完整证据。")]
+#par[#text("引脚检测阶段会先确认主视图是否可用、是否采用关键点检测方式、模型是否已加载。条件满足时进入整图检测路径并输出结构化引脚结果；否则输出一个格式兼容的“不可用”占位结果，保证下游阶段不会因模型缺失而结构崩溃。对于集成芯片，系统可以不完全依赖引脚模型，而是根据边界框与面包板行列约束生成 8 或 14 个引脚，再交给 S2 完成最终孔位映射。每个引脚都记录其编号、引脚名、各视图下的关键点坐标、可见性、分数与来源、综合置信度及元数据，为 S2 提供完整证据。")]
 
 == #text("4.5 S2：孔位映射与多视图证据融合")
 
-#par[#text("S2 阶段将 S1.5 输出的 ordered pin predictions 映射到面包板 hole_id 和 electrical_node_id。它首先尝试用 top 图像对 BreadboardCalibrator 做校准；如果校准失败，则回退到 synthetic grid，并在 calibration.mode 中显式标记。随后，系统对每个 pin 构造 observations，根据 keypoint、可见性、分数、来源和投影信息生成候选孔位，调用 BoardSchema 将 hole_id 解析为 electrical_node_id。")]
+#par[#text("S2 阶段将 S1.5 输出的有序引脚预测映射到面包板的物理孔位和电气导通节点。它首先尝试用主视图对面包板校准器进行校准；若校准失败，则回退到合成网格，并在校准模式中显式标记。随后，系统为每个引脚构造观测记录，结合关键点坐标、可见性、分数、来源和投影信息生成候选孔位，再依据板型规则把孔位解析为对应的导通节点。")]
 
-#par[#text("S2 的一个重要特点是保留不确定性，而不是把不确定性隐藏。每个 mapped pin 会包含 candidate_hole_ids、candidate_node_ids、observation_count、visible_view_ids、is_ambiguous、ambiguity_reasons、evidence_source、decisive_view_id、fusion_confidence、fusion_margin、cross_view_agreement、snap_distance_px 和 snap_confidence。多视图融合元数据还能说明每个视图的贡献、各视图 top1 候选、遮挡时的权重提升和最终选择来源。")]
+#par[#text("S2 的一个重要特点是保留而非隐藏不确定性。每个映射后的引脚都会带上候选孔位列表、候选节点列表、观测次数、可见视图、是否存在歧义及其原因、决定性视图、融合置信度与置信裕度、跨视图一致性、吸附距离和吸附置信度等信息。多视图融合的元数据还能说明每个视图的贡献、各视图的首选候选、遮挡时的权重调整以及最终选择的来源。")]
 
-#par[#text("孔位吸附质量由距离和网格 pitch 共同决定，snap_confidence 使用 1-(d/pitch)^2 的二次衰减公式。模型置信度高但关键点远离孔位的结果会被自动降权，低于阈值时进入 ambiguity_reasons。对于两脚轴向元件、电解电容、跳线和电位器，S2 还实现了 pair selector 和几何先验，防止两个引脚被独立吸附到不符合元件物理形态的孔位。")]
+#par[#text("孔位吸附质量由关键点到孔位的距离和网格间距共同决定，吸附置信度采用 1-(d/pitch)² 的二次衰减形式计算。模型置信度高但关键点明显偏离孔位的结果会被自动降权，低于阈值时记入歧义原因。对于两脚轴向元件、电解电容、跳线和电位器，S2 还引入了引脚配对选择与几何先验，防止两个引脚被独立吸附到不符合元件物理形态的孔位。")]
 
-== #text("4.6 S3：拓扑重构与 netlist_v2 生成")
+== #text("4.6 S3：拓扑重构与网表生成")
 
-#par[#text("S3 阶段读取 S2 映射后的 components[].pins[]，通过 build_analyzer_from_components 构造 CircuitAnalyzer。CircuitAnalyzer 以 NetworkX 图表示元件与网络关系，并使用 Union-Find 合并由 Wire 连接的等电位网络。面包板静态导通关系由 BoardSchema 提供，hole_id 是 source of truth，系统会根据 hole_id 重新解析 electrical_node_id，避免上游修正 hole_id 后旧 node_id 残留导致错误。")]
+#par[#text("S3 阶段读取 S2 映射后的元件及其引脚，构造电路分析器。电路分析器以图结构表示元件与网络的关系，并用并查集合并由导线连接的等电位网络。面包板的静态导通关系由板型规则提供，物理孔位是唯一可信来源，系统会根据孔位重新解析导通节点，避免上游修正孔位后旧节点编号残留而出错。")]
 
-#par[#text("在内部图中，元件节点和网络节点构成二分图；每条边携带 pin、role、pin_role、component、type 和 hole_id 等属性。对于 Wire 元件，系统不把它作为普通电路元件进入最终拓扑，而是通过 Union-Find 把两端网络合并。build_topology_graph 会将合并后的网络组分配为 N0、N1 等 net ID，并对非 Wire 元件建立 component-net 边。若某个非导线元件的多个引脚落入同一个网络，则会标记 same_net，用于短路风险判断。")]
+#par[#text("在内部图中，元件节点和网络节点构成二分图；每条边携带引脚、角色、所属元件、类型和孔位等属性。对于导线，系统不把它作为普通电路元件进入最终拓扑，而是通过并查集把两端网络合并。系统会为合并后的每个网络分配统一编号，并在非导线元件与网络之间建立连接边。若某个非导线元件的多个引脚落入同一网络，则标记为同网络，用于短路风险判断。")]
 
-#par[#text("S3 输出包括 circuit_description、netlist_v2、normalized_components、topology_graph、component_count 和 duration_ms。netlist_v2 保留 components、pins、nets、node_index 和 board_topology；其中 board_topology 含 schema_id、board_type、node_to_holes 和当前 rail_assignments，便于交互界面在用户拖拽或高亮时点亮完整导通条。系统还支持导出 SPICE 网表，Wire 通过 Union-Find 隐式合并，不在 SPICE 网表中单独出现。")]
+#par[#text("S3 的输出包括电路描述、结构化网表、归一化后的元件、拓扑图、元件数量和阶段耗时。结构化网表保留元件、引脚、网络、节点索引和板型拓扑；其中板型拓扑含板型标识、板型类型、节点到孔位的映射和当前电源轨配置，便于交互界面在用户拖拽或高亮时点亮整条导通带。系统还支持导出 SPICE 网表，导线已通过并查集隐式合并，不在 SPICE 网表中单独出现。")]
 
 == #text("4.7 S4：参考电路比较与诊断报告")
 
-#par[#text("S4 阶段只支持 logical_reference_v1 格式，不再支持孔位级或物理点位级 reference 对比。该设计符合教学场景：学生实际摆放孔位可以不同，但只要电气逻辑等价，电路应被判定为正确；相反，即使孔位看似接近，只要逻辑网络错误，就应输出诊断。S4 会把 reference_circuit 转换为 reference graph，把当前 netlist_v2 转换为 current graph，然后调用 compare_logical_graphs。")]
+#par[#text("S4 阶段只接受逻辑参考电路，不再支持孔位级或物理点位级的参考对比。该设计契合教学场景：学生实际摆放的孔位可以不同，但只要电气逻辑等价，电路就应判定为正确；反之，即使孔位看似接近，只要逻辑网络接错，就应输出诊断。S4 会把参考电路和当前网表分别转换为图模型，再进行逻辑结构比较。")]
 
-#par[#text("比较器的设计目标是让用户只标注输入/输出端口和电源轨，内部 signal、对称端口和无极性两脚器件顺序由系统推断。比较流程包括自动检测 reference symmetry、尝试完整图同构、失败时根据 reference 推断 current net role、判断 current 是否包含 reference 或为 reference 子图，最后才使用 graph edit distance 或 fallback 生成错接报告。匹配规则中，power/ground 严格匹配；Resistor、Capacitor、Wire 等无极性两脚器件忽略引脚顺序；LED、Diode、电解电容、三极管、电位器等功能引脚严格匹配。")]
+#par[#text("比较器的设计目标是让用户只标注输入与输出端口和电源轨，内部信号、对称端口和无极性两脚器件的引脚顺序由系统自动推断。比较流程先自动检测参考电路的对称性，再尝试完整的图同构匹配；匹配失败时，根据参考电路推断当前网络的角色，判断当前电路是否包含参考电路或为其子图，最后才用图编辑距离或降级策略生成错接报告。匹配规则中，电源与地严格匹配；电阻、电容、导线等无极性两脚器件忽略引脚顺序；发光二极管、二极管、电解电容、三极管、电位器等器件的功能引脚严格匹配。")]
 
-#par[#text("S4 输出 validator_report_v2 兼容报告。每条诊断项包含 error_code、category、severity、message、suggested_action、evidence_refs、component_id、pin_name、current_hole_id、target_hole_id、current_node_id、target_node_id、expected 和 actual 等字段。常见错误码包括 FLOATING_PIN、WIRE_ENDPOINT_UNCONNECTED、COMPONENT_SHORTED_SAME_NET、POWER_RAIL_SHORT、UNEXPECTED_NET_BRIDGE、HOLE_MISMATCH、POLARITY_REVERSED、COMPONENT_MISSING、PIN_MISSING、LED_SERIES_RESISTOR_MISSING 等。交互端可利用 evidence_refs 和 highlight_protocol 显示具体错误位置。")]
+#par[#text("S4 输出结构化诊断报告。每条诊断项包含错误类型、类别、严重程度、说明文字、建议动作、证据引用，以及涉及的元件、引脚、当前孔位与目标孔位、当前节点与目标节点、期望值与实际值等字段。常见的错误类型包括引脚悬空、导线端点未连接、元件两端落在同一网络造成短路、电源轨短路、出现意外的网络桥接、孔位接错、极性接反、元件缺失、引脚缺失、发光二极管缺少限流电阻等。交互端可借助证据引用和高亮协议显示具体的错误位置。")]
 
 == #text("4.8 服务层与课堂状态")
 
-#par[#text("PipelineService 是服务端业务编排的入口之一。run_sync 会根据 reference_id、inline reference 或默认配置解析参考电路，调用 run_pipeline，并把 reference 来源写入 runtime_metadata。结果构造为 PipelineResult 后，sync_result_to_classroom 会将 component_count、net_count、progress、similarity、diagnostics、comparison_report、risk_level、risk_reasons、circuit_snapshot、netlist_v2、semantic_analysis、runtime_metadata 等信息写入 ClassroomState，同时缓存缩略图。")]
+#par[#text("流水线服务是服务端业务编排的入口之一。它的同步执行流程会根据参考电路编号、内联参考电路或默认配置解析出参考电路，调用流水线主流程，并把参考来源写入运行元数据。结果封装完成后，系统会把元件数量、网络数量、进度、相似度、诊断项、比较报告、风险等级与风险原因、电路快照、结构化网表、语义分析和运行元数据等信息同步写入课堂状态，同时缓存缩略图。")]
 
-#par[#text("一个值得注意的设计是 topology_label 的写入。PipelineService 会尝试调用 GNN-A 拓扑分类器，从 netlist_v2 中识别当前实验场景；只有在分类器启用、存在共识、且置信度为 high 或 medium 时，才把 topology_label 写入 station。否则返回空字符串，让 scene_resolver 进入 fail-open 状态，不会静默默认到错误场景。这是检索契约中的重要防御机制，避免 Agent 在错误场景下检索不相关 fault_case。")]
+#par[#text("一个值得注意的设计是实验场景标签的写入。系统会尝试调用基于图神经网络的拓扑分类器，从网表中识别当前实验场景；只有在分类器启用、结果存在共识、且置信度为高或中等时，才把场景标签写入对应工位。否则返回空值，让场景解析进入“失败放行”状态，而不会静默地默认到某个错误场景。这是知识检索约定中的重要防御机制，可避免智能体在错误场景下检索到不相关的故障案例。")]
 
-== #text("4.9 PCM Agent 与知识检索")
+== #text("4.9 诊断智能体与知识检索")
 
-#par[#text("Agent 架构的核心思想是 PCM，即 Push-Based Context Management。它不是让大模型直接读取全部网表和全部知识库，也不是让大模型重新判断电路事实，而是先从 ClassroomState 中抽取 RuntimeEvidence，再根据 error_code、error_tag、risk_level、current_scene_id 和用户问题构建最小上下文包。ContextPack 包含 pushed_facts、allowed_tools、prompt_rules、citation_requirements、evidence_refs 和历史摘要，并计算字符数和估算 token 数，用于控制边缘端上下文规模。")]
+#par[#text("智能体架构的核心思想是“推送式上下文管理”：不让大模型直接读取全部网表和全部知识库，也不让大模型重新判断电路事实，而是先从课堂状态中抽取运行证据，再根据错误类型、错误标签、风险等级、当前场景和用户问题构建一个最小上下文包。该上下文包只包含被推送的事实、被允许调用的工具、提示规则、引用要求、证据引用和历史摘要，并统计字符数、估算所需 token 数，用于控制边缘端的上下文规模。")]
 
-#par[#text("错误族路由把 COMPONENT_SHORTED_SAME_NET 映射为 short_circuit，把 NODE_MISMATCH、HOLE_MISMATCH、FLOATING_PIN 映射为 wiring_mismatch，把 POLARITY_REVERSED 映射为 polarity_error，把 LED_SERIES_RESISTOR_MISSING 映射为 missing_protection，把缺元件和缺引脚映射到 missing_component 或 incomplete_circuit。不同错误族会得到不同工具白名单：短路场景需要 netlist_trace_tool、board_schema_lookup_tool、safety_rule_lookup_tool 和 heatmap_overlay_tool；接线错误需要 board_schema 与 netlist trace；极性错误需要 datasheet_lookup_tool；概念问答可启用 teaching_concept_lookup_tool，必要时再启用 datasheet 或 circuit KB。")]
+#par[#text("系统会把具体错误归入若干错误族：同网络短路归入短路类，节点接错、孔位接错、引脚悬空归入接线错误类，极性接反归入极性错误类，缺少限流电阻归入保护缺失类，缺元件、缺引脚归入元件缺失或电路不完整类。不同错误族对应不同的工具白名单：短路场景需要网表追踪、板型查询、安全规则查询和热力图叠加等工具；接线错误需要板型查询与网表追踪；极性错误需要器件手册查询；概念问答则启用教学概念查询，必要时再调用器件手册或电路知识库。")]
 
-#par[#text("LangGraph 只承担编排职责。系统按照 classify_error → build_context_pack → react_plan → react_observe → react_reflect 的流程组织 ReAct 循环，再进入 verify_answer；验证失败时执行 repair_answer，最后进入 finalize_answer。即使缺少图编排环境，系统也保留顺序 fallback。Verifier 要求回答包含当前错误码或 evidence_ref；如果 risk_level 为 danger，还必须包含断电、电源或短路复查提示。这种设计保障了回答的可审计性和安全性。")]
+#par[#text("图编排框架只承担流程调度职责。系统按照“错误分类→构建上下文包→规划→观察→反思”的流程组织推理—行动循环，再进入回答验证；验证不通过时执行回答修复，最后定稿回答。即使缺少图编排环境，系统也保留顺序执行的降级路径。回答验证环节要求回答必须包含当前错误类型或证据引用；如果风险等级为危险，还必须包含断电、检查电源或复查短路的提示。这种设计保障了回答的可审计性和安全性。")]
 
-#par[#text("检索契约进一步规定 production agent graph 和蒸馏管线中合法知识源只有 teaching_scene、fault_case、datasheet_v2 和 circuit_kb，另有 station_state、pipeline_snapshot、reference_circuit 等结构化事实通道。旧的 KbService、旧 Chroma/PDF 库和 RagService.answer_with_kb 被禁止进入 Agent 主链路，避免训练部署不一致、云依赖和 wrong-scene 污染。")]
+#par[#text("知识检索约定进一步规定，正式智能体流程和蒸馏管线中合法的知识源只有教学场景库、故障案例库、器件手册库和电路知识库，另有工位状态、流水线快照、参考电路等结构化事实通道。早期的通用知识库服务、基于向量库与 PDF 文档的旧检索方式被禁止进入智能体主链路，以避免训练与部署不一致、云端依赖以及检索到错误场景所造成的污染。")]
 
 == #text("4.10 边缘部署与硬件遥测")
 
-#par[#text("边缘部署方案统一了模型路径和运行默认值。系统以 LABGUARDIAN_MODEL_ROOT 作为模型根目录，组件检测和引脚检测模型分别按预设候选路径查找。默认推理尺寸统一为 960，容器环境可将模型目录以只读方式挂载，并通过 YOLO_MODEL_PATH 与 PIN_MODEL_PATH 指定模型。")]
+#par[#text("边缘部署方案统一了模型路径和运行默认值。系统设有统一的模型根目录，组件检测与引脚检测模型分别按预设候选路径查找；默认推理尺寸统一为 960，容器环境可将模型目录以只读方式挂载，并通过环境变量分别指定两类模型的实际路径。")]
 
-#par[#text("硬件遥测协议面向 DK-2500 运行场景，提供 /ws/telemetry/system 作为 5Hz WebSocket 主通道，/api/v1/telemetry/latest 作为 REST smoke 接口。telemetry_frame_v1 包含 ts、cpu_pct、mem_used_mb、mem_total_mb、igpu_pct、igpu_freq_mhz、npu_pct、npu_power_mw、pipeline_stage 和 sampler_status。采样器应能在硬件不可用或容器缺少 sysfs 时降级返回 null，不阻塞主业务。未来可将 pipeline 阶段耗时与 CPU/iGPU/NPU 占用曲线叠加，用于现场验收展示和实验分析。")]
+#par[#text("硬件遥测协议面向 DK-2500 运行场景，提供一条 5 Hz 的 WebSocket 主通道用于实时推送，并保留一个用于连通性自检的轻量接口。每帧遥测数据包含时间戳、CPU 占用率、已用内存与总内存、iGPU 占用率与频率、NPU 占用率与功耗、当前流水线阶段和采样器状态。采样器在硬件不可用或容器缺少底层接口时应能降级返回空值，不阻塞主业务。未来可将各阶段耗时与 CPU、iGPU、NPU 占用曲线叠加，用于现场验收展示和实验分析。")]
 
 #pagebreak()
 
@@ -410,33 +410,33 @@
 
 == #text("5.1 交互端总体定位")
 
-#par[#text("交互界面采用 React + Vite + TypeScript 实现单工位完整诊断流程。它的主要任务不是承担复杂业务规则，而是把服务端生成的结构化事实清晰呈现给学生和教师。典型使用主线为：上传面包板图片，执行 Pipeline 诊断，展示 S1-S4 事实链、元件、引脚、孔位和网表，再调用 Agent 展示诊断解释和修改建议。")]
+#par[#text("交互界面采用 React + Vite + TypeScript 实现单工位完整诊断流程。它的主要任务不是承担复杂业务规则，而是把服务端生成的结构化事实清晰呈现给学生和教师。典型使用主线为：上传面包板图片，执行流水线诊断，展示 S1 至 S4 事实链、元件、引脚、孔位和网表，再调用智能体展示诊断解释和修改建议。")]
 
-#par[#text("交互端使用 Vite、TypeScript、React 和 lucide-react 图标库构建。系统界面按接口封装、类型定义、通用组件、诊断流程和样式模块组织：接口封装负责访问服务端能力，类型定义约束 Pipeline、Agent 和 UI 数据结构，通用组件实现上传、画布标注、阶段耗时、诊断卡片、网表和原始数据展示，诊断流程模块负责状态管理、钩子调用和主流程编排。")]
+#par[#text("交互端使用 Vite、TypeScript、React 和 lucide-react 图标库构建。系统界面按接口封装、类型定义、通用组件、诊断流程和样式模块组织：接口封装负责访问服务端能力，类型定义约束流水线、智能体和界面的数据结构，通用组件实现上传、画布标注、阶段耗时、诊断卡片、网表和原始数据展示，诊断流程模块负责状态管理、逻辑复用和主流程编排。")]
 
 == #text("5.2 API 封装")
 
-#par[#text("接口客户端提供统一的 JSON 请求封装。它从环境配置读取服务端地址，默认请求超时 5 分钟，并使用 AbortController 控制超时；当响应失败时，系统解析 detail 字段生成结构化错误信息。该设计保证 Pipeline 推理较慢时交互端不会过早失败，也能向用户显示“请求超时，请确认服务端服务和模型推理状态”等可理解提示。")]
+#par[#text("接口客户端提供统一的请求封装。它从环境配置读取服务端地址，默认请求超时 5 分钟，并在超时后主动中断请求；当响应失败时，系统解析返回的错误详情生成结构化错误信息。该设计保证流水线推理较慢时交互端不会过早失败，也能向用户显示“请求超时，请确认服务端服务和模型推理状态”等可理解提示。")]
 
-#par[#text("Pipeline 接口封装健康检查、版本查询、同步诊断、人工修正重算、电路分析和端口可视化等能力；Agent 接口封装问答提交、状态查询和结果轮询逻辑。核心服务契约包括健康检查、版本查询、Pipeline 运行、Agent 问答和 Agent 状态查询。")]
+#par[#text("流水线接口封装健康检查、版本查询、同步诊断、人工修正重算、电路分析和端口可视化等能力；智能体接口封装问答提交、状态查询和结果轮询逻辑。核心服务契约包括健康检查、版本查询、流水线运行、智能体问答和智能体状态查询。")]
 
 == #text("5.3 主页面功能组织")
 
-#par[#text("主页面是交互端诊断流程的中心。页面状态由统一状态管理逻辑维护，并围绕服务状态检查、参考电路选择、Pipeline 执行、Agent 对话和拓扑建议等功能组织。页面顶层包括系统状态栏、指标概览、上传面板、参考电路选择、证据链主区域、诊断面板、Agent 对话区、阶段时间线和原始数据查看区。")]
+#par[#text("主页面是交互端诊断流程的中心。页面状态由统一的状态管理逻辑维护，并围绕服务状态检查、参考电路选择、流水线执行、智能体对话和拓扑建议等功能组织。页面顶层包括系统状态栏、指标概览、上传面板、参考电路选择、证据链主区域、诊断面板、智能体对话区、阶段时间线和原始数据查看区。")]
 
-#par[#text("主区域有两种展示方式：网表模式支持孔位修正、端口标注、网络角色、引脚极性和 IC 标注；图像模式在原始图片上渲染识别框和高亮目标。诊断面板按严重程度对 comparison_report.items 排序，用户选择某条诊断后，系统从 evidence_refs 中提取高亮目标并传递给图像或网表视图，实现“点击错误—定位元件/引脚/孔位”的交互。")]
+#par[#text("主区域有两种展示方式：网表模式支持孔位修正、端口标注、网络角色、引脚极性和集成芯片标注；图像模式在原始图片上渲染识别框和高亮目标。诊断面板按严重程度对各条诊断项排序，用户选择某条诊断后，系统从其证据引用中提取高亮目标并传递给图像或网表视图，实现“点击错误—定位元件、引脚、孔位”的交互。")]
 
 == #text("5.4 上传、运行与阶段进度")
 
-#par[#text("上传流程会先检查文件类型是否为 image/*，再将图像转换为 base64 字符串并保存到页面状态中。Pipeline 执行时提交 station_id、images_b64、conf、iou、imgsz、reference_id、rail_assignments、port_annotations、net_role_assignments 和 ic_annotations。运行成功后，交互端保存 PipelineResult，并自动调用 Agent 生成诊断解释。")]
+#par[#text("上传流程会先检查文件是否为图片类型，再将图像编码并保存到页面状态中。执行流水线时，交互端提交工位编号、图片数据、置信度、交并比、推理尺寸、参考电路编号、电源轨指定、端口标注、网络角色标注和集成芯片标注等参数。运行成功后，交互端保存诊断结果，并自动调用智能体生成诊断解释。")]
 
-#par[#text("为了提升使用体验，交互端为 detect、pin_detect、mapping、topology、validate、semantic_analysis 等阶段设置了前台进度节奏。这一节奏用于在请求过程中展示阶段推进，并不代表服务端真实耗时。真实耗时仍应以服务端 stages[].duration_ms、total_duration_ms 和 runtime_metadata 为准。")]
+#par[#text("为了提升使用体验，交互端为组件检测、引脚检测、孔位映射、拓扑重构、参考验证、语义分析等阶段设置了前台进度节奏。这一节奏用于在请求过程中展示阶段推进，并不代表服务端真实耗时。真实耗时仍应以服务端返回的各阶段耗时、总耗时和运行元数据为准。")]
 
 == #text("5.5 人工修正与重算")
 
-#par[#text("人工修正是交互端的重要能力。系统会从当前 PipelineResult 的 mapping 阶段取出 components，结合人工修正生成 correction patch，再整理 portAnnotations、manualNetRoleAssignments、manualIcAnnotations 和 pinPolarityAssignments。如果没有任何修正或标注，交互端会提示用户先标注端口、修改孔位或指定网络角色。若存在有效修改，则调用 recomputeCorrected，把这些结构化输入提交给服务端。")]
+#par[#text("人工修正是交互端的重要能力。系统会从当前诊断结果的映射阶段取出元件，结合人工修正生成修正补丁，再整理端口标注、网络角色标注、集成芯片标注和引脚极性标注。如果没有任何修正或标注，交互端会提示用户先标注端口、修改孔位或指定网络角色。若存在有效修改，则调用人工修正重算接口，把这些结构化输入提交给服务端。")]
 
-#par[#text("这种重算机制让系统从一次性自动判断转向“可纠错的教学工具”。在真实课堂中，视觉模型难免出现漏检、误检或孔位吸附偏差。如果系统不能允许人工修正，教师就只能放弃这次结果；而 LabGuardian 允许保留视觉阶段识别到的大部分事实，只对有争议的 pin 或端口做局部修改，再让拓扑和比较模块重新判断，这更符合实验教学中的人机协同逻辑。")]
+#par[#text("这种重算机制让系统从一次性自动判断转向“可纠错的教学工具”。在真实课堂中，视觉模型难免出现漏检、误检或孔位吸附偏差。如果系统不能允许人工修正，教师就只能放弃这次结果；而 LabGuardian 允许保留视觉阶段识别到的大部分事实，只对有争议的引脚或端口做局部修改，再让拓扑和比较模块重新判断，这更符合实验教学中的人机协同逻辑。")]
 
 #pagebreak()
 
@@ -451,67 +451,67 @@
   [#text("接口")],
   [#text("方法")],
   [#text("用途")],
-  [#text("/health")],
+  [#text("健康检查")],
   [#text("GET")],
-  [#text("交互端启动时检查服务端服务是否在线")],
-  [#text("/version")],
+  [#text("交互端启动时检查服务端是否在线")],
+  [#text("版本查询")],
   [#text("GET")],
   [#text("获取系统版本、模型版本、规则版本等展示信息")],
-  [#text("/api/v1/pipeline/run")],
+  [#text("同步诊断")],
   [#text("POST")],
-  [#text("同步执行完整 Pipeline，课堂快速验证场景直接返回 PipelineResult")],
-  [#text("/api/v1/pipeline/submit")],
+  [#text("同步执行完整流水线，课堂快速验证场景直接返回诊断结果")],
+  [#text("异步提交")],
   [#text("POST")],
-  [#text("异步提交 Pipeline 任务，需要 Celery 和 Redis")],
-  [#text("/api/v1/pipeline/status/{job_id}")],
+  [#text("异步提交诊断任务，依赖任务队列与缓存中间件")],
+  [#text("任务状态查询")],
   [#text("GET")],
-  [#text("查询异步 Pipeline 任务状态")],
-  [#text("/api/v1/pipeline/recompute-corrected")],
+  [#text("查询异步诊断任务的执行状态")],
+  [#text("人工修正重算")],
   [#text("POST")],
-  [#text("应用交互端人工修正后重跑 S3/S4/S5")],
-  [#text("/api/v1/pipeline/analyze")],
+  [#text("应用交互端人工修正后重新执行 S3、S4、S5")],
+  [#text("电路分析")],
   [#text("POST")],
   [#text("返回元件引脚定位、网表和拓扑图")],
-  [#text("/api/v1/pipeline/compare-netlist")],
+  [#text("网表比较")],
   [#text("POST")],
-  [#text("调试接口，直接比较 reference 与 current_netlist_v2")],
-  [#text("/api/v1/pipeline/visualize/ports")],
+  [#text("调试接口，直接比较参考电路与当前网表")],
+  [#text("端口可视化")],
   [#text("POST")],
   [#text("返回端口映射列表，用于交互端可视化")],
-  [#text("/api/v1/angnt/ask")],
+  [#text("智能体问答")],
   [#text("POST")],
-  [#text("提交 Agent 问答任务")],
-  [#text("/api/v1/angnt/status/{job_id}")],
+  [#text("提交智能体问答任务")],
+  [#text("智能体结果查询")],
   [#text("GET")],
-  [#text("轮询 Agent 结果")],
-  [#text("/ws/telemetry/system")],
+  [#text("轮询智能体回答结果")],
+  [#text("硬件遥测推送")],
   [#text("WebSocket")],
   [#text("实时推送硬件遥测帧")],
 )
 
-== #text("6.2 PipelineRequest 与 PipelineResult")
+== #text("6.2 诊断请求与诊断结果")
 
-#par[#text("PipelineRequest 的核心字段包括 station_id、images_b64、conf、iou、imgsz、reference_id、reference_circuit、rail_assignments、port_annotations、net_role_assignments、net_alias_assignments、net_merge_assignments、pin_polarity_assignments 和 ic_annotations。交互端当前将图片转为不含 data:image 前缀的纯 base64 字符串，便于服务端统一解码。rail_assignments 用于指定电源轨角色；port_annotations 只要求用户标注输入/输出端口；net_role_assignments、alias 和 merge 主要用于高级调试或人工修正。")]
+#par[#text("诊断请求的核心内容包括工位编号、图片数据、置信度、交并比、推理尺寸、参考电路编号或内联参考电路、电源轨指定、端口标注、网络角色与别名设置、网络合并设置、引脚极性标注和集成芯片标注。交互端当前将图片编码为不含前缀的字符串，便于服务端统一解码。其中电源轨指定用于设定电源轨角色；端口标注只要求用户标注输入与输出端口；网络角色、别名和合并设置主要用于高级调试或人工修正。")]
 
-#par[#text("PipelineResult 是交互端、课堂状态和 Agent 共用的结果模型。它承载 job_id、station_id、stages、component_count、net_count、progress、similarity、diagnostics、risk_level、risk_reasons、comparison_report、runtime_metadata 等字段。stages 中的每个阶段都包含 stage 名称、数据和耗时；runtime_metadata 则记录模型路径、推理参数、参考电路来源、人工标注和网络归一化信息。")]
+#par[#text("诊断结果是交互端、课堂状态和智能体共用的结果模型。它承载任务编号、工位编号、各阶段结果、元件数量、网络数量、进度、相似度、诊断项、风险等级与风险原因、比较报告和运行元数据等内容。每个阶段结果都包含阶段名称、阶段数据和耗时；运行元数据则记录模型路径、推理参数、参考电路来源、人工标注和网络归一化信息。")]
 
-== #text("6.3 netlist_v2")
+== #text("6.3 结构化网表")
 
-#par[#text("netlist_v2 是当前主链路最重要的数据结构。它不是简单的文字网表，而是一个可被交互端、validator、Agent 和后续实验统计共同消费的结构化对象。其核心内容包括 board_schema_id、components、nets、node_index 和 board_topology。components 中每个元件包含 component_id、component_type、package_type、part_subtype、polarity、orientation、symmetry_group、pins、confidence 和 metadata；pins 中保留 pin_id、pin_name、hole_id、electrical_node_id、electrical_net_id、observations、confidence、is_ambiguous 和 metadata。")]
+#par[#text("结构化网表是当前主链路最重要的数据结构。它不是简单的文字网表，而是一个可被交互端、验证模块、智能体和后续实验统计共同消费的结构化对象。其核心内容包括板型标识、元件列表、网络列表、节点索引和板型拓扑。每个元件包含元件编号、元件类型、封装类型、子类型、极性、方向、对称组、引脚列表、置信度和元数据；每个引脚保留引脚编号、引脚名、物理孔位、导通节点、电气网络、观测记录、置信度、是否存在歧义和元数据。")]
 
-#par[#text("nets 表示由 Union-Find 合并后的电气网络，每个 ElectricalNet 包含 electrical_net_id、member_node_ids、member_hole_ids 和 power_role。node_index 保存 electrical_node_id 到 hole_id 的索引，board_topology 保存完整的 node_to_holes 和 rail_assignments。这样，交互端不仅能知道某个引脚属于哪个 net，还能在用户点击某个网络时高亮全部相关孔位。")]
+#par[#text("网络列表表示由并查集合并后的电气网络，每个网络包含网络编号、成员节点、成员孔位和电源角色。节点索引保存导通节点到物理孔位的映射，板型拓扑保存完整的节点到孔位映射和电源轨配置。这样，交互端不仅能知道某个引脚属于哪个网络，还能在用户点击某个网络时高亮全部相关孔位。")]
 
-== #text("6.4 validator_report_v2 与高亮协议")
+== #text("6.4 诊断报告与高亮协议")
 
-#par[#text("validator_report_v2 是诊断结果的核心报告格式。summary 中包含 total_item_count、logic_correct、similarity、comparison_mode、match_type、ignore_component_id、ignore_hole_id、ignore_passive_pin_order、allow_extra_wires、strict_functional_pin_roles 和 report_layers 等信息。items 则是具体诊断项，每项携带 error_code、category、severity、message、suggested_action 和 evidence_refs。")]
+#par[#text("诊断报告是诊断结果的核心报告格式。其摘要部分包含诊断项总数、逻辑是否正确、相似度、比较模式、匹配类型，以及是否忽略元件编号、是否忽略孔位、是否忽略无极性引脚顺序、是否允许额外导线、是否严格校验功能引脚角色和报告层级等信息。报告主体是具体诊断项，每项携带错误类型、类别、严重程度、说明文字、建议动作和证据引用。")]
 
-#par[#text("高亮协议 labguardian_highlight_v1 把 evidence_refs 转换为交互端可直接绘制的 targets。target 可以是 component_bbox_ref，渲染为元件框；可以是 pin_keypoint_ref，渲染为引脚点；也可以是 hole_candidate_ref，渲染为当前孔位、目标孔位和候选孔位。AgentService 也可以把同一份高亮协议作为 evidence 输出，使自然语言解释与可视化定位保持一致。")]
+#par[#text("高亮协议把证据引用转换为交互端可直接绘制的高亮目标。目标可以是元件框引用，渲染为元件框；可以是引脚关键点引用，渲染为引脚点；也可以是孔位候选引用，渲染为当前孔位、目标孔位和候选孔位。智能体服务也可以把同一份高亮协议作为证据输出，使自然语言解释与可视化定位保持一致。")]
 
-== #text("6.5 RuntimeEvidence 与 ContextPack")
+== #text("6.5 运行证据与上下文包")
 
-#par[#text("RuntimeEvidence 是 Agent 从 ClassroomState 中抽取的运行证据，包含 station_id、risk_level、error_codes、error_tags、findings、netlist_v2、circuit_snapshot、reference_circuit、current_scene_id、history_facts 和 history_summary 等。它是 Agent 的事实输入，而不是自然语言长上下文。ContextPack 则是 PCM 编译后的每轮上下文，包含 pushed_facts、allowed_tools、prompt_rules、citation_requirements 和 evidence_refs，并附带 ContextPackMetrics 记录推送事实数、工具数、证据数、历史长度和估算 token。")]
+#par[#text("运行证据是智能体从课堂状态中抽取的当前证据，包含工位编号、风险等级、错误类型、错误标签、诊断发现、结构化网表、电路快照、参考电路、当前场景、历史事实和历史摘要等。它是智能体的事实输入，而不是自然语言长上下文。上下文包则是上下文管理机制每轮编译后的结果，包含被推送的事实、被允许的工具、提示规则、引用要求和证据引用，并附带相应指标，记录推送事实数、工具数、证据数、历史长度和估算 token 数。")]
 
-#par[#text("这样的结构使 Agent 的行为可控：它只能看到被推送的事实和被允许的工具，不会越过 validator 重新猜测孔位或网络。对于边缘端部署，这也有助于减少上下文长度，降低小模型或规则模板的负担。")]
+#par[#text("这样的结构使智能体的行为可控：它只能看到被推送的事实和被允许的工具，不会越过验证模块重新猜测孔位或网络。对于边缘端部署，这也有助于减少上下文长度，降低小模型或规则模板的负担。")]
 
 #pagebreak()
 
@@ -519,31 +519,31 @@
 
 == #text("7.1 结构化事实链")
 
-#par[#text("项目最大的工程创新在于把“看图诊断电路”拆成多个可解释的事实转换步骤，而不是用单个端到端大模型直接回答。S1 负责元件实例，S1.5 负责引脚候选，S2 负责孔位吸附，S3 负责导通网络，S4 负责逻辑比较，Agent 负责解释。这种结构化事实链让每一步都能被单独测试、单独可视化、单独修正，也使错误定位更具体。")]
+#par[#text("项目最大的工程创新在于把“看图诊断电路”拆成多个可解释的事实转换步骤，而不是用单个端到端大模型直接回答。S1 负责元件实例，S1.5 负责引脚候选，S2 负责孔位吸附，S3 负责导通网络，S4 负责逻辑比较，智能体负责解释。这种结构化事实链让每一步都能被单独测试、单独可视化、单独修正，也使错误定位更具体。")]
 
 == #text("7.2 多视角与抗遮挡策略")
 
-#par[#text("针对真实实验中常见的遮挡问题，系统预留多角度拍摄与多视图融合能力。S1 支持 side recall candidates，S2 的协议包含多视图 observation、evidence_source、decisive_view_id、fusion_confidence、fusion_margin 和 cross_view_agreement。虽然当前流程以单图输入为主，但服务端数据结构和 S2 融合逻辑已经为多视角扩展预留空间。遮挡感知权重规则会在 top 不可见或置信度低时提高 side 视图权重，避免单一俯视图失效。")]
+#par[#text("针对真实实验中常见的遮挡问题，系统预留多角度拍摄与多视图融合能力。S1 支持侧视图补充候选，S2 的数据协议包含多视图观测、证据来源、决定性视图、融合置信度、置信裕度和跨视图一致性。虽然当前流程以单图输入为主，但服务端数据结构和 S2 的融合逻辑已经为多视角扩展预留空间。遮挡感知的权重规则会在主视图不可见或置信度低时提高侧视图权重，避免单一俯视图失效。")]
 
-== #text("7.3 BoardSchema 与 Snap-to-Grid")
+== #text("7.3 板型规则与孔位吸附")
 
-#par[#text("BoardSchema 把物理孔位规范化为稳定 electrical_node_id，是连接视觉与电气逻辑的桥梁。默认比赛板 schema 覆盖 A1-E63、F1-J63 和 LP/LN/RP/RN 两段电源轨，并兼容历史 rail_top+、rail_top-、rail_bot+、rail_bot- 命名。Snap-to-Grid 不仅选取最近孔位，还结合 snap_distance、pitch、候选列表、元件几何约束和多视图投票形成可信度评估。")]
+#par[#text("板型规则把物理孔位规范化为稳定的导通节点，是连接视觉与电气逻辑的桥梁。默认比赛板覆盖主区 63 行（分上下两个半区）和左右两段电源轨，并兼容早期的电源轨命名方式。孔位吸附不仅选取最近孔位，还结合吸附距离、网格间距、候选列表、元件几何约束和多视图投票，形成对吸附结果的可信度评估。")]
 
 == #text("7.4 图论拓扑与逻辑比较")
 
-#par[#text("CircuitAnalyzer 使用 NetworkX 和 Union-Find 生成电气拓扑，compare_logical_graphs 则把参考电路和当前网表都转换为 component-net 二分图，再进行拓扑感知比较。相比逐孔位对比，图比较可以容忍无极性器件的引脚互换、内部信号名称差异和合理的额外导线；相比纯文本规则，它又能严格处理电源、地、功能引脚和极性器件。")]
+#par[#text("电路分析器借助图结构和并查集生成电气拓扑，比较器则把参考电路和当前网表都转换为“元件—网络”二分图，再进行拓扑感知的比较。相比逐孔位对比，图比较可以容忍无极性器件的引脚互换、内部信号名称差异和合理的额外导线；相比纯文本规则，它又能严格处理电源、地、功能引脚和极性器件。")]
 
-== #text("7.5 PCM Agent 与可验证回答")
+== #text("7.5 诊断智能体与可验证回答")
 
-#par[#text("PCM Agent 的创新在于“先压缩事实，再选择工具，最后生成回答”。它根据错误族和意图动态选择工具白名单，避免把所有技能、知识和历史都塞进上下文。Verifier 则保证输出必须引用错误码或证据，并在危险风险时输出安全提醒。该机制特别适合实验教学：学生得到的是可追溯的解释，教师也可以根据 evidence_refs 检查系统是否真的基于当前电路作答。")]
+#par[#text("诊断智能体的创新在于“先压缩事实，再选择工具，最后生成回答”。它根据错误族和用户意图动态选择工具白名单，避免把所有技能、知识和历史都塞进上下文。回答验证环节则保证输出必须引用错误类型或证据，并在高风险时输出安全提醒。该机制特别适合实验教学：学生得到的是可追溯的解释，教师也可以根据证据引用检查系统是否真的基于当前电路作答。")]
 
 == #text("7.6 人工修正闭环")
 
-#par[#text("许多 AI 辅助系统只关注“模型一次性给出答案”，但真实教学现场需要可修正。LabGuardian 的 recompute-corrected 接口和交互端 NetlistView 让用户把 AI 识别结果修成可信事实，再让服务端重新执行拓扑和验证。这种闭环把 AI 作为助教而非裁判，既增强可用性，也符合工程教育中“学生理解并修正错误”的目标。")]
+#par[#text("许多 AI 辅助系统只关注“模型一次性给出答案”，但真实教学现场需要可修正。LabGuardian 的人工修正重算接口和交互端的网表视图让用户把 AI 识别结果修成可信事实，再让服务端重新执行拓扑和验证。这种闭环把 AI 作为助教而非裁判，既增强可用性，也符合工程教育中“学生理解并修正错误”的目标。")]
 
 == #text("7.7 边缘可观测与可复现实验")
 
-#par[#text("项目不仅关注功能，也关注运行可观测性。runtime_metadata 记录模型路径、版本、参数、设备和板型；telemetry_frame_v1 记录 CPU、内存、iGPU、NPU 和 pipeline_stage。通过统一的运行元数据与遥测帧，系统可以支撑 p50/p90 延迟、峰值内存、模型版本、上下文长度、工具调用数和验证结果等实验指标，为后续复现实验和性能评估提供依据。")]
+#par[#text("项目不仅关注功能，也关注运行可观测性。运行元数据记录模型路径、版本、参数、设备和板型；遥测数据帧记录 CPU、内存、iGPU、NPU 占用和当前流水线阶段。通过统一的运行元数据与遥测帧，系统可以支撑 P50/P90 延迟、峰值内存、模型版本、上下文长度、工具调用数和验证结果等实验指标，为后续复现实验和性能评估提供依据。")]
 
 #pagebreak()
 
@@ -551,7 +551,7 @@
 
 == #text("8.1 现有测试线索")
 
-#par[#text("项目已经建立基础回归样例与冒烟测试，覆盖板型映射、逻辑图比较、参考电路加载、Pipeline 阶段契约和 Agent 诊断流程等关键环节。现有测试能够验证主链路输入输出是否稳定，也能在功能迭代时发现数据结构漂移、错误码变化和降级逻辑失效等问题。后续测试重点应继续扩展多视图融合、孔位吸附质量、Agent ReAct 循环、硬件遥测和边缘端推理一致性。")]
+#par[#text("项目已经建立基础回归样例与冒烟测试，覆盖板型映射、逻辑图比较、参考电路加载、流水线阶段契约和智能体诊断流程等关键环节。现有测试能够验证主链路输入输出是否稳定，也能在功能迭代时发现数据结构漂移、错误类型变化和降级逻辑失效等问题。后续测试重点应继续扩展多视图融合、孔位吸附质量、智能体推理循环、硬件遥测和边缘端推理一致性。")]
 
 == #text("8.2 建议的测试体系")
 
@@ -563,34 +563,34 @@
   [#text("测试对象")],
   [#text("重点指标")],
   [#text("单元测试")],
-  [#text("BoardSchema、Union-Find、net normalization、error code、ContextPack")],
-  [#text("映射正确性、边界输入、空值降级、错误码稳定")],
+  [#text("板型规则、并查集、网络归一化、错误类型、上下文包")],
+  [#text("映射正确性、边界输入、空值降级、错误类型稳定")],
   [#text("阶段测试")],
   [#text("S1、S1.5、S2、S3、S4、S5")],
-  [#text("阶段输入输出 schema、duration_ms、fallback 标记、不确定性字段")],
+  [#text("各阶段输入输出格式、耗时、降级标记、不确定性字段")],
   [#text("回归测试")],
-  [#text("典型参考电路和错接 fixture")],
-  [#text("逻辑正确率、错误码一致性、suggested_action 稳定性")],
+  [#text("典型参考电路和错接样例")],
+  [#text("逻辑正确率、错误类型一致性、建议动作稳定性")],
   [#text("交互端测试")],
-  [#text("上传、结果展示、人工修正、Agent 轮询")],
+  [#text("上传、结果展示、人工修正、智能体轮询")],
   [#text("状态流转、错误提示、按钮禁用、高亮目标一致性")],
   [#text("集成测试")],
-  [#text("交互端→服务端→Agent 端到端")],
-  [#text("完整链路可运行、PipelineResult 和 AgentResult 可解析")],
+  [#text("交互端→服务端→智能体端到端")],
+  [#text("完整链路可运行、诊断结果与智能体回答可解析")],
   [#text("边缘测试")],
   [#text("DK-2500 运行、模型路径、遥测、延迟")],
-  [#text("p50/p90、峰值 RSS、CPU/iGPU/NPU 占用、降级行为")],
+  [#text("P50/P90、峰值内存、CPU/iGPU/NPU 占用、降级行为")],
 )
 
 == #text("8.3 数据集与评测建议")
 
-#par[#text("视觉模型评测应将元件检测、引脚检测和孔位映射分开统计。元件检测可统计 mAP、漏检率和误检率；引脚检测可统计关键点误差、可见性分类和 ordered pin 顺序正确率；孔位映射应统计 Top-1 hole 准确率、Top-k 候选覆盖率、snap_confidence 分布和低置信场景召回率。对于多视图，建议比较 top-only 与 multi-view 的 A/B 结果，重点关注遮挡、反光、强弱光、倾斜拍摄和复杂布线样本。")]
+#par[#text("视觉模型评测应将元件检测、引脚检测和孔位映射分开统计。元件检测可统计 mAP、漏检率和误检率；引脚检测可统计关键点误差、可见性分类和有序引脚的顺序正确率；孔位映射应统计孔位首选命中准确率、前 k 个候选的覆盖率、吸附置信度分布和低置信场景的召回率。对于多视图，建议比较单视图与多视图的对照结果，重点关注遮挡、反光、强弱光、倾斜拍摄和复杂布线样本。")]
 
-#par[#text("拓扑和诊断评测应以电路级任务为单位。可选择一阶 RC、反相运放、同相运放、NE555 定时器、LED 限流、三极管开关等教学模板，构造正确、缺线、错孔、短路、极性反接、缺保护电阻、端口标注错误等场景。指标包括逻辑正确判定准确率、错误码命中率、错误定位准确率、建议动作可执行性、误报率和漏报率。")]
+#par[#text("拓扑和诊断评测应以电路级任务为单位。可选择一阶 RC 电路、反相运放、同相运放、NE555 定时器、LED 限流、三极管开关等教学模板，构造正确、缺线、错孔、短路、极性反接、缺保护电阻、端口标注错误等场景。指标包括逻辑正确判定准确率、错误类型命中率、错误定位准确率、建议动作可执行性、误报率和漏报率。")]
 
-== #text("8.4 Agent 质量保障")
+== #text("8.4 智能体质量保障")
 
-#par[#text("Agent 测试不应只看自然语言是否“像人话”，还要检查是否遵守证据约束。建议为每个 error family 构造 golden case，验证 ContextPack.allowed_tools 是否符合预期，工具调用顺序是否在白名单内，回答是否包含至少一个当前错误码或 evidence_ref，danger 场景是否优先提醒断电与短路复查。对于概念问答、实验指导和混合意图，应检查检索源是否符合 retrieval contract，wrong-scene rate 和 legacy fallback rate 必须为零。")]
+#par[#text("智能体测试不应只看自然语言是否“像人话”，还要检查是否遵守证据约束。建议为每个错误族构造标准测试用例，验证被允许调用的工具是否符合预期、工具调用顺序是否在白名单内、回答是否包含至少一个当前错误类型或证据引用、高风险场景是否优先提醒断电与短路复查。对于概念问答、实验指导和混合意图，应检查检索源是否符合知识检索约定，错误场景命中率和旧检索回退率必须为零。")]
 
 #pagebreak()
 
@@ -598,19 +598,93 @@
 
 == #text("9.1 本地运行部署")
 
-#par[#text("服务端本地运行流程为安装运行依赖、启动 Redis、启动 Celery Worker、启动 FastAPI。课堂快速验证阶段可以直接使用同步接口 POST /api/v1/pipeline/run，无需异步任务；如果要测试 /submit 和 /status/{job_id}，则需要 Redis 和 Celery Worker。交互端运行流程为安装 npm 依赖后启动页面服务；若服务端不在 127.0.0.1:8000，则通过 VITE_API_BASE_URL 指定服务端地址。")]
+#par[#text("服务端本地运行流程为安装运行依赖、启动 Redis、启动 Celery 工作进程、启动 FastAPI 服务。课堂快速验证阶段可以直接使用同步诊断接口，无需异步任务；如果要测试异步提交与任务状态查询接口，则需要 Redis 和 Celery 工作进程。交互端运行流程为安装依赖后启动页面服务；若服务端不在本机默认地址，则通过环境变量指定服务端地址。")]
 
 == #text("9.2 Docker 与模型目录")
 
-#par[#text("边缘部署建议采用统一模型根目录，并把模型资源以只读方式挂载到容器。组件检测模型和引脚检测模型分别通过 YOLO_MODEL_PATH 和 PIN_MODEL_PATH 指定；当显式路径不可用时，系统应按预设候选路径查找，并在运行元数据中记录实际加载结果。为了保证复现实验，模型版本、推理尺寸、置信度阈值和板型 schema 应写入 runtime_metadata。")]
+#par[#text("边缘部署建议采用统一模型根目录，并把模型资源以只读方式挂载到容器。组件检测模型和引脚检测模型分别通过环境变量指定；当显式路径不可用时，系统应按预设候选路径查找，并在运行元数据中记录实际加载结果。为了保证复现实验，模型版本、推理尺寸、置信度阈值和板型定义应写入运行元数据。")]
 
 == #text("9.3 DK-2500 部署设想")
 
-#par[#text("DK-2500 搭载 Intel Core Ultra 5 225U，具备展示 CPU、iGPU、NPU 异构协同的硬件条件。当前系统已具备设备配置、runtime_metadata、telemetry 和 OpenVINO/GenAI 接入预留等基础能力；S1/S1.5 的 ONNX 导出、OpenVINO GPU/NPU 插件适配、INT8 量化、PT 与 ONNX 一致性测试、真机 p50/p90 延迟和峰值内存统计等仍属于后续边缘评测工作。")]
+#par[#text("DK-2500 搭载 Intel Core Ultra 5 225U，具备展示 CPU、iGPU、NPU 异构协同的硬件条件。本项目在板端通过 OpenVINO 2026.1 + libze1 1.21.9 + intel-level-zero-npu 1.26 的驱动栈完成异构推理，并对三类典型负载做了端到端实测。基于实测数据，本节给出每种计算单元在 LabGuardian 全流程中的最佳归属与性能表现。")]
 
-== #text("9.4 运行安全与降级策略")
+== #text("9.4 DK-2500 异构性能实测与分析")
 
-#par[#text("实验教学系统必须有降级策略。视觉模型缺失时，S1.5 可以输出 unavailable 外壳；校准失败时，S2 使用 synthetic_fallback 并标记低可信；拓扑分类器失败时，scene_id 为空并跳过 fault_case 检索；硬件遥测字段不可用时返回 null；Agent 没有真实 LLM 时仍使用确定性模板 provider。这样的 fail-open 或 fail-closed 策略能避免系统在现场因一个模块不可用而整体崩溃，同时也防止错误默认值污染诊断。")]
+#par[#text("LabGuardian 的端到端流程涉及视觉检测、拓扑重构、知识检索与智能诊断四个阶段，各阶段对计算资源的需求差异显著。通过 turbostat 以 0.25 秒间隔采样 RAPL 能量计，并在板端单进程串行采集 60 至 1153 次推理统计，本节给出 YOLOv8s-pose 关键点检测在 CPU、iGPU、NPU 三种单元上的延迟、吞吐与功耗实测数据。")]
+
+#figure(
+  image("pictures/cadx/power_timeseries.pdf", width: 90%),
+  caption: [YOLOv8s-pose INT8 在 DK-2500 上的 RAPL 功耗时序。三段彩色背景分别对应 CPU/iGPU/NPU 三种 worker 各自 sustained 15 秒的工作态。CPU 峰值 30.9 W 几乎全部由 cores 承担；iGPU 总功率 10.8 W；NPU 总功率 10.0 W 但 CPU cores 与 iGPU 全程空闲，是实现真正异构并行的关键],
+) <fig:power-ts>
+
+#par[#text("上图直观展示了三种计算单元在执行视觉推理时的功耗特征。NPU 推理期间 CPU 核心与 iGPU 功率曲线全程贴近空闲基线（约 4.42 W），说明 NPU 几乎不占用其他单元资源，为“NPU 负责视觉、GPU 负责诊断、CPU 负责控制”的三路并行提供了硬件层面的可行性。")]
+
+#par[#text("下表给出六种配置下的详细性能指标。NPU INT8 在所有维度均最优：延迟 13.37 ms、吞吐 74.7 img/s、P99 抖动仅 15.61 ms，满足课堂实时视频流需求。INT8 PTQ 通过 NNCF Fast Bias Correction 在 144 张校准图上完成，模型从 22 MB 压缩至 11 MB，NPU 吞吐反而从 60.4 提升至 74.7 img/s。")]
+
+#table(
+  columns: (1.2fr, 1fr, 1fr, 1fr, 1fr, 1fr, 1fr),
+  inset: 6pt,
+  stroke: 0.5pt,
+  [#text("设备")],
+  [#text("精度")],
+  [#text("负载(s)")],
+  [#text("均值(ms)")],
+  [#text("P95(ms)")],
+  [#text("P99(ms)")],
+  [#text("img/s")],
+  [#text("CPU")],
+  [#text("FP16")],
+  [#text("0.14")],
+  [#text("92.44")],
+  [#text("96.74")],
+  [#text("98.92")],
+  [#text("10.8")],
+  [#text("CPU")],
+  [#text("INT8")],
+  [#text("0.24")],
+  [#text("29.02")],
+  [#text("30.13")],
+  [#text("30.65")],
+  [#text("34.5")],
+  [#text("iGPU")],
+  [#text("FP16")],
+  [#text("0.43")],
+  [#text("26.87")],
+  [#text("27.32")],
+  [#text("28.18")],
+  [#text("37.2")],
+  [#text("iGPU")],
+  [#text("INT8")],
+  [#text("2.85")],
+  [#text("18.26")],
+  [#text("19.29")],
+  [#text("20.11")],
+  [#text("54.7")],
+  [#text("NPU")],
+  [#text("FP16")],
+  [#text("1.01")],
+  [#text("16.55")],
+  [#text("16.64")],
+  [#text("17.67")],
+  [#text("60.4")],
+  [#text("NPU")],
+  [#text("INT8")],
+  [#text("1.20")],
+  [#text("13.37")],
+  [#text("13.75")],
+  [#text("15.61")],
+  [#text("74.7")],
+)
+
+#par[#text("从能效角度，NPU INT8 的增量功耗仅 4.12 W（空闲基线 4.42 W），单次推理能耗 114.2 mJ，性能功耗比达到 18.1 ips/W；相比 CPU INT8 节能 7.1 倍、性能功耗比提升 12.1 倍。基于以上数据，系统对三类负载的异构分工如下：")]
+
+- #text("NPU (INT8) — 视觉常驻：YOLOv8s-pose 关键点检测全程部署于 NPU，75 img/s 的吞吐可满足课堂多工位并发拍摄需求，同时释放 CPU 与 iGPU 资源。")
+- #text("iGPU (FP16/INT4) — 诊断加速：智能体模块中的视觉大模型与 Anomalib 热力图推理部署于 iGPU，利用 GPU 的 SIMT 架构处理动态形状的自回归计算。")
+- #text("CPU — 控制面与图引擎：GNN 拓扑分类、模板匹配器的 VF2 子图同构、LangGraph 节点调度、RAG 知识检索与 SPICE 网表生成全部走 CPU，这些不规则数据流逻辑正是 NPU/GPU 不擅长的场景。")
+
+== #text("9.5 运行安全与降级策略")
+
+#par[#text("实验教学系统必须有降级策略。视觉模型缺失时，S1.5 可以输出“不可用”占位结果；校准失败时，S2 使用合成网格回退并标记为低可信；拓扑分类器失败时，场景标签留空并跳过故障案例检索；硬件遥测字段不可用时返回空值；智能体没有可用的大模型时仍使用确定性的模板生成器。这样的“失败放行”或“失败拒止”策略能避免系统在现场因一个模块不可用而整体崩溃，同时也防止错误默认值污染诊断。")]
 
 #pagebreak()
 
@@ -618,23 +692,23 @@
 
 == #text("10.1 当前已形成的工程成果")
 
-- #text("服务端服务骨架已建立，包括 pipeline_service、guidance_service、version_service、rag_service、agent_service 和 classroom_state。")
+- #text("服务端服务骨架已建立，包括流水线服务、指导服务、版本服务、知识检索服务、智能体服务和课堂状态管理。")
 
-- #text("新网表模型 netlist_v2 已成为主输出结构，S3/S4/validator 和交互端均围绕该结构消费事实。")
+- #text("新的结构化网表已成为主输出结构，拓扑重构（S3）、参考验证（S4）、验证模块和交互端均围绕该结构消费事实。")
 
-- #text("视觉主链已固定为 YOLO-Detect 组件检测和 full-image YOLO-Pose 引脚检测，OBB 和 ROI fallback 保留兼容但不作为默认主路。")
+- #text("视觉主链已固定为基于 YOLO-Detect 的组件检测和基于整图 YOLO-Pose 的引脚检测，定向框检测和区域裁剪等回退方式保留兼容但不作为默认主路。")
 
-- #text("S2 已输出 components[].pins[]、候选孔位、候选节点、多视图证据、不确定性和吸附质量字段。")
+- #text("S2 已输出元件及其引脚、候选孔位、候选节点、多视图证据、不确定性和吸附质量等字段。")
 
-- #text("BoardSchema 默认比赛板已支持 63 行主区和分段电源轨，用户只需标注电源轨和输入/输出端口。")
+- #text("默认比赛板的板型规则已支持 63 行主区和分段电源轨，用户只需标注电源轨和输入与输出端口。")
 
-- #text("S4 已基于 logical_reference_v1 和 topology-aware graph compare 输出 validator_report_v2。")
+- #text("S4 已基于逻辑参考电路和拓扑感知的图比较输出结构化诊断报告。")
 
-- #text("PCM Agent 已具备 RuntimeEvidence、ContextPack、错误族路由、确定性工具、ReAct 循环、Verifier 和 repair 分支。")
+- #text("诊断智能体已具备运行证据、上下文包、错误族路由、确定性工具、推理—行动循环、回答验证和回答修复分支。")
 
-- #text("Web 交互端已完成单工位诊断界面，支持上传、事实链展示、诊断卡片、Agent 对话和人工重算。")
+- #text("Web 交互端已完成单工位诊断界面，支持上传、事实链展示、诊断卡片、智能体对话和人工重算。")
 
-- #text("说明材料较完整，覆盖视觉契约、比较架构、板型格式、错误码、检索契约、边缘部署和遥测协议。")
+- #text("说明材料较完整，覆盖视觉契约、比较架构、板型格式、错误类型、检索约定、边缘部署和遥测协议。")
 
 == #text("10.2 完成情况与边界说明")
 
@@ -652,20 +726,20 @@
   [#text("目标")],
   [#text("验收产物")],
   [#text("近期")],
-  [#text("稳定 Pipeline 契约和交互端诊断流程，补齐关键错接场景")],
-  [#text("更多 fixture、回归测试、交互端高亮和人工修正体验优化")],
+  [#text("稳定流水线契约和交互端诊断流程，补齐关键错接场景")],
+  [#text("更多测试样例、回归测试、交互端高亮和人工修正体验优化")],
   [#text("中期")],
-  [#text("完成 DK-2500 真机部署与 edge benchmark")],
-  [#text("ONNX/OpenVINO 模型、INT8 量化实验、p50/p90/RSS/telemetry 报告")],
+  [#text("完成 DK-2500 真机部署与边缘性能基准测试")],
+  [#text("ONNX/OpenVINO 模型、INT8 量化实验、延迟、内存与遥测报告")],
   [#text("中期")],
-  [#text("扩展 reference DSL 和教学知识库")],
-  [#text("更多教学模板、datasheet_v2、fault_case 和 circuit_kb 条目")],
+  [#text("扩展参考电路描述语言和教学知识库")],
+  [#text("更多教学模板、器件手册、故障案例和电路知识库条目")],
   [#text("后期")],
   [#text("引入更强的多视角融合和低置信交互")],
-  [#text("遮挡样本 A/B 测试、可视化证据 overlay、标定误差统计")],
+  [#text("遮挡样本对照测试、可视化证据叠加、标定误差统计")],
   [#text("扩展")],
   [#text("评估 VLM/PCB AOI 是否重新纳入独立模块")],
-  [#text("独立 scope、独立 API、独立测试，不破坏主链路检索契约")],
+  [#text("独立范围、独立接口、独立测试，不破坏主链路检索约定")],
 )
 
 #pagebreak()
@@ -674,23 +748,23 @@
 
 == #text("11.1 视觉识别风险")
 
-#par[#text("视觉模型的主要风险是遮挡、反光、拍摄角度、元件类别不平衡和引脚关键点误差。改进方案包括继续扩充真实实验样本，强化遮挡、强弱光和密集布线数据；对低 snap_confidence 和 multi_view_vote_conflict 的样本建立人工复核机制；将 decisive_view_id、per_view_contribution 和 snap_distance 可视化到交互端；对 IC、轴向元件和电位器等特殊元件继续完善几何先验。")]
+#par[#text("视觉模型的主要风险是遮挡、反光、拍摄角度、元件类别不平衡和引脚关键点误差。改进方案包括继续扩充真实实验样本，强化遮挡、强弱光和密集布线数据；对低吸附置信度和多视图投票冲突的样本建立人工复核机制；将决定性视图、各视图贡献和吸附距离可视化到交互端；对集成芯片、轴向元件和电位器等特殊元件继续完善几何先验。")]
 
 == #text("11.2 拓扑与参考电路风险")
 
-#par[#text("拓扑比较依赖 reference DSL 和端口标注。如果参考电路定义不准确、端口标注缺失或电源轨设置错误，系统可能给出错误诊断。改进方案包括为 reference DSL 建立审查流程，为每个实验模板提供示意图和默认端口提示，在交互端运行前强制检查 rail_assignments 和必要端口，提供 compare-netlist 调试接口帮助教师验证参考电路。")]
+#par[#text("拓扑比较依赖参考电路描述和端口标注。如果参考电路定义不准确、端口标注缺失或电源轨设置错误，系统可能给出错误诊断。改进方案包括为参考电路描述建立审查流程，为每个实验模板提供示意图和默认端口提示，在交互端运行前强制检查电源轨配置和必要端口，提供网表比较调试接口帮助教师验证参考电路。")]
 
-== #text("11.3 Agent 与知识检索风险")
+== #text("11.3 智能体与知识检索风险")
 
-#par[#text("Agent 的风险主要是 wrong-scene 检索、旧知识源污染、自由发挥和安全提示缺失。当前 retrieval contract 已经通过合法源清单、禁用源清单、训练部署不变量和 fail-closed 机制降低风险。后续应继续执行 gold set 评测，监控 wrong-scene rate、legacy fallback rate、datasheet recall 和回答证据覆盖率；新增任何检索入口都必须更新 retrieval-contract.md 并补测试。")]
+#par[#text("智能体的风险主要是错误场景检索、旧知识源污染、自由发挥和安全提示缺失。当前知识检索约定已经通过合法源清单、禁用源清单、训练部署一致性约束和失败拒止机制降低风险。后续应继续执行标准评测集评测，监控错误场景命中率、旧检索回退率、器件手册召回率和回答证据覆盖率；新增任何检索入口都必须同步更新检索约定文档并补充测试。")]
 
 == #text("11.4 边缘部署风险")
 
-#par[#text("边缘部署风险包括模型体积、推理延迟、共享内存压力、OpenVINO 设备兼容、NPU 驱动路径不稳定和容器权限限制。改进方案包括拆分 server-dev、edge-cpu、edge-openvino 镜像；导出 S1/S1.5 ONNX 并做 parity test；记录阶段 latency、p50/p90、peak RSS、模型版本和 board_schema_id；对 telemetry sampler 采用 defensive 设计，避免硬件采样异常影响主服务。")]
+#par[#text("边缘部署风险包括模型体积、推理延迟、共享内存压力、OpenVINO 设备兼容、NPU 驱动路径不稳定和容器权限限制。改进方案包括拆分开发镜像、CPU 边缘镜像和 OpenVINO 边缘镜像；导出 S1、S1.5 的 ONNX 模型并做一致性校验；记录各阶段延迟、P50/P90、峰值内存、模型版本和板型标识；对遥测采样器采用防御式设计，避免硬件采样异常影响主服务。")]
 
 == #text("11.5 交互端体验风险")
 
-#par[#text("交互端需要避免把复杂 JSON 直接暴露给学生。建议将 NetlistView 的高级修正入口分层隐藏，普通学生优先看到“哪里错、为什么、怎么改”；教师或维护者再展开 candidate holes、evidence_refs、raw JSON 和 manual net roles。对于错误卡片，应提供一键高亮、修复步骤、参考图示和安全提醒；对于低置信结果，应明确提示“需人工确认”，避免误导。")]
+#par[#text("交互端需要避免把复杂的原始数据直接暴露给学生。建议将网表视图的高级修正入口分层隐藏，普通学生优先看到“哪里错、为什么、怎么改”；教师或维护者再展开候选孔位、证据引用、原始数据和人工网络角色。对于错误卡片，应提供一键高亮、修复步骤、参考图示和安全提醒；对于低置信结果，应明确提示“需人工确认”，避免误导。")]
 
 #pagebreak()
 
@@ -700,29 +774,29 @@
 
 #par[#text("LabGuardian 对学生最大的价值是把实验反馈从“等待教师巡查”转变为“即时自助排错”。在传统课堂中，学生经常在某个接线点卡住十几分钟，最终得到的反馈可能只是教师一句“这里接错了”。这种反馈虽然能解决眼前问题，却不一定帮助学生理解面包板导通关系、元件引脚功能和电路拓扑。LabGuardian 的诊断结果包含元件、引脚、孔位、节点、网络、参考连接和建议动作，学生可以沿着证据链理解错误产生原因，从而把一次排错转化为一次概念强化。")]
 
-#par[#text("系统还可以支持形成性评价。学生每次上传和修正都会产生结构化数据，例如常见错误码、错孔类型、短路风险、端口标注错误、低置信孔位和修复前后相似度变化。这些数据可以帮助学生回顾自己的薄弱环节，也可以作为实验报告中的过程性证据。与只看最终波形是否正确相比，过程数据更能反映学生是否真正理解了电路搭建逻辑。")]
+#par[#text("系统还可以支持形成性评价。学生每次上传和修正都会产生结构化数据，例如常见错误类型、错孔类型、短路风险、端口标注错误、低置信孔位和修复前后相似度变化。这些数据可以帮助学生回顾自己的薄弱环节，也可以作为实验报告中的过程性证据。与只看最终波形是否正确相比，过程数据更能反映学生是否真正理解了电路搭建逻辑。")]
 
 == #text("12.2 对教师教学组织的价值")
 
-#par[#text("对教师和助教而言，LabGuardian 可以把大量重复检查工作前置给系统。教师不再需要逐个实验台检查“电阻是否跨行”“LED 是否有限流电阻”“电源轨是否短路”“运放正负电源是否接反”等基础问题，而是可以优先处理系统标记为 danger 或 warning 的工位。课堂状态中保存的 risk_level、diagnostics、comparison_report、netlist_v2 和 topology_label 可以进一步汇总为教师看板，显示哪些实验模板最容易出错、哪类元件最常被误接、哪些学生需要重点辅导。")]
+#par[#text("对教师和助教而言，LabGuardian 可以把大量重复检查工作前置给系统。教师不再需要逐个实验台检查“电阻是否跨行”“LED 是否有限流电阻”“电源轨是否短路”“运放正负电源是否接反”等基础问题，而是可以优先处理系统标记为危险或警告的工位。课堂状态中保存的风险等级、诊断项、比较报告、结构化网表和实验场景标签可以进一步汇总为教师看板，显示哪些实验模板最容易出错、哪类元件最常被误接、哪些学生需要重点辅导。")]
 
-#par[#text("这种看板并不是为了替代教师，而是帮助教师把注意力从机械巡检转向概念讲解和个性化指导。当某一错误码在多个工位频繁出现时，教师可以暂停全班操作，统一讲解对应知识点；当某个工位多次出现低 snap_confidence 或多视图冲突时，教师可以指导学生调整拍摄角度或复查遮挡区域。")]
+#par[#text("这种看板并不是为了替代教师，而是帮助教师把注意力从机械巡检转向概念讲解和个性化指导。当某一类错误在多个工位频繁出现时，教师可以暂停全班操作，统一讲解对应知识点；当某个工位多次出现低吸附置信度或多视图冲突时，教师可以指导学生调整拍摄角度或复查遮挡区域。")]
 
 == #text("12.3 对课程资源建设的价值")
 
-#par[#text("LabGuardian 的 reference DSL、logical_reference_v1、teaching_scene、fault_case、datasheet_v2 和 circuit_kb 可以逐步沉淀为课程知识资产。每个实验模板不仅包含电路原理，还包含参考拓扑、端口语义、预期测量点、常见故障、错误码解释和安全提醒。随着课程迭代，教师可以不断补充新的参考电路和故障案例，使系统从单次辅助工具发展为电子实验课程的数字化资源库。")]
+#par[#text("LabGuardian 的参考电路描述、逻辑参考电路、教学场景库、故障案例库、器件手册库和电路知识库可以逐步沉淀为课程知识资产。每个实验模板不仅包含电路原理，还包含参考拓扑、端口语义、预期测量点、常见故障、错误类型解释和安全提醒。随着课程迭代，教师可以不断补充新的参考电路和故障案例，使系统从单次辅助工具发展为电子实验课程的数字化资源库。")]
 
-#par[#text("这类资源库具有可复用性。不同学校的电子基础实验虽然教材和器件略有差异，但面包板导通规则、两脚无极性元件、LED 限流、运放供电、三极管引脚等知识具有通用性。只要 BoardSchema、参考 DSL 和 datasheet 条目支持版本化，系统就能迁移到不同课程、不同实验箱和不同板型。")]
+#par[#text("这类资源库具有可复用性。不同学校的电子基础实验虽然教材和器件略有差异，但面包板导通规则、两脚无极性元件、LED 限流、运放供电、三极管引脚等知识具有通用性。只要板型规则、参考电路描述和器件手册条目支持版本化，系统就能迁移到不同课程、不同实验箱和不同板型。")]
 
 == #text("12.4 项目实施组织建议")
 
-#par[#text("从工程实施角度，团队可按照“视觉算法、服务端架构、交互端交互、知识库与测试、边缘部署”五条线并行推进。视觉算法线负责数据采集、标注规范、YOLO-Detect/YOLO-Pose 训练、孔位吸附误差分析和多视图融合；服务端架构线负责 Pipeline 契约、BoardSchema、netlist_v2、validator 和服务层接口；交互端交互线负责上传、证据链展示、人工修正、Agent 对话和教师看板；知识库与测试线负责 reference DSL、fault_case、datasheet_v2、golden tests 和检索契约；边缘部署线负责 DK-2500 环境、模型转换、OpenVINO、telemetry 和 benchmark。")]
+#par[#text("从工程实施角度，团队可按照“视觉算法、服务端架构、交互端交互、知识库与测试、边缘部署”五条线并行推进。视觉算法线负责数据采集、标注规范、YOLO-Detect/YOLO-Pose 训练、孔位吸附误差分析和多视图融合；服务端架构线负责流水线契约、板型规则、结构化网表、验证模块和服务层接口；交互端交互线负责上传、证据链展示、人工修正、智能体对话和教师看板；知识库与测试线负责参考电路描述、故障案例、器件手册、标准测试集和检索约定；边缘部署线负责 DK-2500 环境、模型转换、OpenVINO、遥测和基准测试。")]
 
-#par[#text("后续实施中应坚持“先明确契约，再调整实现，再补充测试，再更新说明材料”的原则。例如修改 S2 输出字段时，应同步更新阶段协议与回归样例；修改错误码时，应同步更新诊断规则与测试样例；修改 Agent 检索行为时，应同步检查场景路由、知识源约束和 fallback 逻辑。这样可以降低多人协作时的数据结构漂移风险。")]
+#par[#text("后续实施中应坚持“先明确契约，再调整实现，再补充测试，再更新说明材料”的原则。例如修改 S2 输出字段时，应同步更新阶段协议与回归样例；修改错误类型时，应同步更新诊断规则与测试样例；修改智能体检索行为时，应同步检查场景路由、知识源约束和降级逻辑。这样可以降低多人协作时的数据结构漂移风险。")]
 
 == #text("12.5 推广路径与落地成本")
 
-#par[#text("推广路径可以分为三个阶段。第一阶段是单工位验证，目标是跑通一套典型实验，如 RC 电路、LED 限流或运放反相放大器，展示上传图片、生成网表、发现错误和 Agent 解释。第二阶段是课程实验室试点，目标是在若干实验台部署边缘服务器或共享服务器，采集真实错接样本，优化视觉模型和交互端交互。第三阶段是课程资源平台化，目标是形成参考电路库、故障案例库、教学概念库和教师看板，把系统嵌入实验教学流程。")]
+#par[#text("推广路径可以分为三个阶段。第一阶段是单工位验证，目标是跑通一套典型实验，如 RC 电路、LED 限流或运放反相放大器，展示上传图片、生成网表、发现错误和智能体解释。第二阶段是课程实验室试点，目标是在若干实验台部署边缘服务器或共享服务器，采集真实错接样本，优化视觉模型和交互端交互。第三阶段是课程资源平台化，目标是形成参考电路库、故障案例库、教学概念库和教师看板，把系统嵌入实验教学流程。")]
 
 #par[#text("落地成本主要包括边缘计算设备、摄像设备或学生手机、模型训练数据、教师维护参考电路的时间，以及系统部署维护成本。当前设计不依赖固定工业相机，优先支持学生手机上传，这有利于降低硬件门槛。服务器端若能在 DK-2500 本地运行，则可以减少云资源费用和网络依赖。长期看，最大的成本不是硬件，而是高质量数据和课程知识资产建设，因此项目应重视数据标注规范、知识条目版本化和教师可编辑工具。")]
 
@@ -736,14 +810,14 @@
   [#text("交付内容")],
   [#text("验收标准")],
   [#text("功能交付")],
-  [#text("图像上传、Pipeline 运行、网表展示、诊断卡片、Agent 解释、人工重算")],
+  [#text("图像上传、流水线运行、网表展示、诊断卡片、智能体解释、人工重算")],
   [#text("至少一套典型实验可稳定端到端运行")],
   [#text("数据交付")],
-  [#text("参考电路、错接样本、datasheet JSON、fault_case、测试 fixture")],
+  [#text("参考电路、错接样本、器件手册数据、故障案例、测试样例")],
   [#text("每个模板覆盖正确与典型错误场景")],
   [#text("算法交付")],
   [#text("组件检测、引脚检测、孔位映射、拓扑比较、风险分类")],
-  [#text("输出字段符合契约，错误码和证据可追溯")],
+  [#text("输出字段符合契约，错误类型和证据可追溯")],
   [#text("部署交付")],
   [#text("服务端启动脚本、交互端启动脚本、模型目录、Docker/Redis/Celery 配置")],
   [#text("新环境能依据说明材料复现系统运行")],
@@ -754,9 +828,9 @@
 
 == #text("12.7 典型课堂使用流程")
 
-#par[#text("典型课堂使用流程可设计为“正常电路—错误电路—人工修正—Agent 解释—边缘遥测”五步。第一步展示一个正确搭建的参考电路，上传图片后让系统输出较高相似度和无严重错误报告，说明系统能理解正确拓扑。第二步将某个电阻或导线移动到错误孔位，重新上传后展示 HOLE_MISMATCH、NODE_MISMATCH 或 COMPONENT_SHORTED_SAME_NET 等错误码，并点击诊断卡片让交互端高亮具体引脚和孔位。第三步在 NetlistView 中人工修正低置信孔位或补充端口标注，调用 recompute-corrected，说明系统支持人机协同而不是一次性黑盒判断。第四步打开 AgentChat，让系统用自然语言解释错误原因、证据和修复步骤，强调回答引用的是 validator_report_v2 与 netlist_v2 事实。第五步展示 runtime_metadata 或 telemetry，说明系统为 DK-2500 边缘部署和异构计算展示预留了可观测数据。")]
+#par[#text("典型课堂使用流程可设计为“正常电路—错误电路—人工修正—智能体解释—边缘遥测”五步。第一步展示一个正确搭建的参考电路，上传图片后让系统输出较高相似度和无严重错误报告，说明系统能理解正确拓扑。第二步将某个电阻或导线移动到错误孔位，重新上传后展示孔位接错、节点接错或同网络短路等错误类型，并点击诊断卡片让交互端高亮具体引脚和孔位。第三步在网表视图中人工修正低置信孔位或补充端口标注，调用人工修正重算，说明系统支持人机协同而不是一次性黑盒判断。第四步打开智能体对话，让系统用自然语言解释错误原因、证据和修复步骤，强调回答引用的是诊断报告与结构化网表中的事实。第五步展示运行元数据或遥测，说明系统为 DK-2500 边缘部署和异构计算展示预留了可观测数据。")]
 
-#par[#text("项目验收展示应避免将所有技术点一次性堆叠，而应围绕“问题为何困难、系统如何拆解、当前完成了什么、下一步如何验证”展开。可以先用一张面包板实物图解释遮挡和孔位问题，再用一张数据流图解释 S1 到 S4 事实链，然后展示交互界面中的 evidence chain，最后说明 Agent 为什么不会凭空猜测。对于 PCB AOI 和 VLM 微观诊断，可以说明其属于后续扩展方向；当前主线聚焦面包板拓扑诊断，工程边界更清晰，验收目标也更可控。")]
+#par[#text("项目验收展示应避免将所有技术点一次性堆叠，而应围绕“问题为何困难、系统如何拆解、当前完成了什么、下一步如何验证”展开。可以先用一张面包板实物图解释遮挡和孔位问题，再用一张数据流图解释 S1 到 S4 事实链，然后展示交互界面中的证据链，最后说明智能体为什么不会凭空猜测。对于 PCB AOI 和 VLM 微观诊断，可以说明其属于后续扩展方向；当前主线聚焦面包板拓扑诊断，工程边界更清晰，验收目标也更可控。")]
 
 #par[#text("在课堂试点中，使用流程可转换为学生操作流程：学生先按实验指导书搭建电路，使用手机拍摄上传；系统返回风险等级和错误位置；学生依据建议修改电路；修改后再次上传验证；最终将诊断前后对比、修复说明和测量结果写入实验报告。教师则可以在后台查看班级错误统计，选择共性问题进行集中讲解。这种流程把 LabGuardian 嵌入已有教学环节，而不是要求课程完全重构。")]
 
@@ -764,11 +838,11 @@
 
 = #text("第十三章 结论")
 
-#par[#text("LabGuardian 选题具有明确的教学价值和工程挑战。它面向高校电子实验中真实存在的痛点：教师巡检压力大、学生排错慢、面包板遮挡严重、二维原理图到三维实物映射困难、诊断结果缺少证据链。项目并没有停留在“用 AI 看一张图片”的层面，而是把视觉识别、孔位映射、板型知识、图论拓扑、参考电路比较、诊断报告、交互端高亮和 Agent 解释串联成一条完整事实链。")]
+#par[#text("LabGuardian 选题具有明确的教学价值和工程挑战。它面向高校电子实验中真实存在的痛点：教师巡检压力大、学生排错慢、面包板遮挡严重、二维原理图到三维实物映射困难、诊断结果缺少证据链。项目并没有停留在“用 AI 看一张图片”的层面，而是把视觉识别、孔位映射、板型知识、图论拓扑、参考电路比较、诊断报告、交互端高亮和智能体解释串联成一条完整事实链。")]
 
-#par[#text("从当前完成情况看，项目最扎实的部分是结构化 Pipeline 和数据契约。S1/S1.5/S2 把图像转为 pin/hole 事实，S3 通过 BoardSchema 和 Union-Find 生成 netlist_v2，S4 通过 topology-aware graph compare 生成 validator_report_v2，Agent 通过 RuntimeEvidence 和 ContextPack 在证据约束下回答问题。交互端则提供了较完整的诊断闭环，支持上传、展示、诊断、对话和人工修正。")]
+#par[#text("从当前完成情况看，项目最扎实的部分是结构化流水线和数据契约。S1、S1.5、S2 把图像转为引脚与孔位事实，S3 通过板型规则和并查集生成结构化网表，S4 通过拓扑感知的图比较生成诊断报告，智能体通过运行证据和上下文包在证据约束下回答问题。交互端则提供了较完整的诊断闭环，支持上传、展示、诊断、对话和人工修正。")]
 
-#par[#text("后续工作的重点应是以真实样本和真机数据验证系统可靠性，而不是继续扩大概念范围。建议优先完成多视角样本评测、错接 fixture 扩充、交互高亮完善、DK-2500 边缘评测和知识库 gold set 评估。在此基础上，再评估是否将 VLM 微观诊断和 PCB AOI 作为独立扩展模块纳入。总体而言，LabGuardian 已具备从实验系统走向教学工具原型的基础，若能持续加强数据、测试和边缘部署验证，将有潜力成为高校电子实验智能化教学的有价值样板。")]
+#par[#text("后续工作的重点应是以真实样本和真机数据验证系统可靠性，而不是继续扩大概念范围。建议优先完成多视角样本评测、错接样例扩充、交互高亮完善、DK-2500 边缘评测和知识库标准评测集评估。在此基础上，再评估是否将 VLM 微观诊断和 PCB AOI 作为独立扩展模块纳入。总体而言，LabGuardian 已具备从实验系统走向教学工具原型的基础，若能持续加强数据、测试和边缘部署验证，将有潜力成为高校电子实验智能化教学的有价值样板。")]
 
 #pagebreak()
 
@@ -794,25 +868,25 @@
   stroke: 0.5pt,
   [#text("术语")],
   [#text("含义")],
-  [#text("hole_id")],
-  [#text("面包板物理孔位编号，如 A12、LP31")],
-  [#text("electrical_node_id")],
-  [#text("面包板静态导通节点编号，由 BoardSchema 根据 hole_id 解析")],
-  [#text("electrical_net_id")],
+  [#text("物理孔位")],
+  [#text("面包板上每个插孔的物理编号，如 A12、LP31")],
+  [#text("导通节点")],
+  [#text("面包板静态导通节点编号，由板型规则根据物理孔位解析")],
+  [#text("电气网络")],
   [#text("动态电气网络编号，由元件和导线连接合并后生成")],
-  [#text("netlist_v2")],
+  [#text("结构化网表")],
   [#text("当前主链路的结构化网表格式，包含元件、引脚、网络和板型拓扑")],
-  [#text("logical_reference_v1")],
+  [#text("逻辑参考电路")],
   [#text("教师或参考模板提供的逻辑参考电路格式")],
-  [#text("validator_report_v2")],
-  [#text("S4 输出的结构化诊断报告，包含错误码、证据和建议")],
-  [#text("RuntimeEvidence")],
-  [#text("Agent 从课堂状态抽取的当前运行证据")],
-  [#text("ContextPack")],
-  [#text("PCM 编译后的最小上下文包，包含事实、工具、规则和证据引用")],
-  [#text("BoardSchema")],
-  [#text("描述面包板孔位、导通节点、电源轨和别名的板型规则")],
-  [#text("Snap-to-Grid")],
+  [#text("诊断报告")],
+  [#text("参考比较（S4）输出的结构化诊断报告，包含错误类型、证据和建议")],
+  [#text("运行证据")],
+  [#text("智能体从课堂状态抽取的当前运行证据")],
+  [#text("上下文包")],
+  [#text("上下文管理机制编译后的最小上下文，包含事实、工具、规则和证据引用")],
+  [#text("板型规则")],
+  [#text("描述面包板孔位、导通节点、电源轨和别名的板型定义")],
+  [#text("孔位吸附")],
   [#text("将视觉关键点吸附到最近面包板孔位并计算置信度的过程")],
 )
 
@@ -827,13 +901,13 @@
   [#text("孔位映射模块")],
   [#text("将图像关键点吸附到面包板孔位，并映射为电气导通节点")],
   [#text("拓扑重构模块")],
-  [#text("基于板型规则和导线连接关系生成 netlist_v2 与拓扑图")],
+  [#text("基于板型规则和导线连接关系生成结构化网表与拓扑图")],
   [#text("参考比较模块")],
   [#text("将当前电路与逻辑参考电路进行图结构比较，输出诊断报告")],
-  [#text("Agent 诊断模块")],
+  [#text("智能体诊断模块")],
   [#text("基于运行证据、知识库和确定性工具生成可解释反馈")],
   [#text("交互展示模块")],
   [#text("提供上传、结果展示、错误定位、人工修正和对话交互能力")],
   [#text("边缘遥测模块")],
-  [#text("采集 CPU、内存、iGPU、NPU 和 Pipeline 阶段状态，用于性能观测")],
+  [#text("采集 CPU、内存、iGPU、NPU 和流水线阶段状态，用于性能观测")],
 )
