@@ -101,6 +101,8 @@
 
 #par[#text("本报告围绕项目目标、需求分析、总体架构、系统实现、接口数据结构、关键技术、测试验证、部署方案和后续改进方向展开。系统主链路聚焦面包板电路的结构化诊断，采用 S1 组件检测、S1.5 全图引脚姿态检测、S2 孔位映射、S3 拓扑与网表生成、S4 逻辑参考比较、S5 语义分析的事实链；诊断智能体以结构化证据和确定性工具为基础生成解释，避免将事实判断直接交由大模型完成。PCB AOI、端侧 VLM 微观缺陷识别等能力作为后续扩展方向，不作为本报告已完成主链路的核心内容。")]
 
+#par[#text("在主链路之外，面向教学问答的端侧解释小模型亦已按双教师蒸馏路线完成首轮落地：以本地部署与云端调用的两个大模型教师在同一份结构化证据上作答，据此构建监督微调数据，对一款 1.5B 规模的学生模型完成 LoRA 微调、权重合并与 OpenVINO INT4 导出，并在本地 CPU 与 GPU 上完成小规模评测，验证了端侧运行链路的可行性；但其回答质量仍处于初步验证阶段，尚需更大规模评测与质量对齐。")]
+
 #par(first-line-indent: 0em)[#text("关键词：边缘 AI；电子实验教学；面包板电路；YOLO-Pose；板型规则；结构化网表；图同构比较；推送式上下文管理；RAG 知识增强；React 交互端。")]
 
 #pagebreak()
@@ -110,6 +112,8 @@
 #par[#text("LabGuardian is an intelligent tutoring system for fundamental electronic laboratory courses in higher education. The system focuses on breadboard circuit construction, component pin localization, hole mapping, topology reconstruction, reference circuit comparison, and diagnostic explanation. It addresses practical problems in traditional electronics labs, including heavy teacher inspection workload, low troubleshooting efficiency for students, severe occlusion in real circuit images, and the difficulty of mapping schematics to physical connections. Targeting edge computing platforms such as DK-2500, the system emphasizes local inference, knowledge retrieval, heterogeneous computing, and privacy protection for teaching data. It integrates visual perception, structured netlist representation, logical comparison, a diagnostic agent, interactive interface, and hardware telemetry into a complete experimental workflow.")]
 
 #par[#text("This report systematically summarizes the project goals, requirements, overall architecture, system implementation, interface data structures, key technologies, testing and deployment plans, project progress, and future improvement directions. The main workflow focuses on structured diagnosis of breadboard circuits, following the fact chain of S1 component detection, S1.5 full-image pin pose detection, S2 hole mapping, S3 topology and netlist generation, S4 logical reference comparison, and S5 semantic analysis. The diagnostic agent generates explanations based on structured evidence and deterministic tools instead of delegating factual judgment to a large language model. PCB AOI and edge-side VLM micro-defect recognition are treated as future extensions rather than completed core functions.")]
+
+#par[#text("Beyond the main pipeline, an on-device explanation model for teaching-oriented question answering has completed a first round of implementation along a dual-teacher distillation route: two large-model teachers, one deployed locally and one accessed via API, answer over the same structured evidence to construct supervised fine-tuning data; a 1.5B student model is then fine-tuned with LoRA, merged, and exported to OpenVINO INT4, and evaluated at small scale on local CPU and GPU. This validates the feasibility of the on-device pipeline, while its answer quality remains at an early validation stage and calls for larger-scale evaluation and alignment.")]
 
 #par(first-line-indent: 0em)[#text("Keywords: edge AI; electronic laboratory teaching; breadboard circuit; YOLO-Pose; board schema; structured netlist; graph isomorphism comparison; push-based context management; RAG knowledge enhancement; interactive interface.")]
 
@@ -424,7 +428,7 @@
 
 #par[#text("诊断智能体的核心思想是“推送式上下文管理”：不让大模型直接读取全部网表和全部知识库，也不让它重新判断电路事实，而是先从课堂状态中抽取运行证据，再根据错误类型、错误标签、风险等级、当前场景和用户问题，编译出一个最小上下文包。智能体只能看到被推送的事实和被允许调用的工具，从而把它的行为约束在已被验证的结论之内，不会越过验证模块重新猜测孔位或网络。")]
 
-#par[#text("运行证据是智能体从课堂状态中抽取的当前事实，包含工位编号、风险等级、错误类型与错误标签、诊断发现、结构化网表、电路快照、参考电路、当前场景以及历史摘要等，它是结构化的事实输入，而非自然语言长上下文。上下文包则是上下文管理机制每轮编译后的结果，只包含被推送的事实、被允许的工具、提示规则、引用要求和证据引用，并统计推送事实数、工具数、证据数、历史长度与估算 token 数，用于控制边缘端的上下文规模。对于小模型或规则模板部署，这种压缩显著降低了上下文负担。")]
+#par[#text("运行证据是智能体从课堂状态中抽取的当前事实，包含工位编号、风险等级、错误类型与错误标签、诊断发现、结构化网表、电路快照、参考电路、当前场景以及历史摘要等，它是结构化的事实输入，而非自然语言长上下文。上下文包则是上下文管理机制每轮编译后的结果，只包含被推送的事实、被允许的工具、提示规则、引用要求和证据引用，并统计推送事实数、工具数、证据数、历史长度与估算 token 数，用于控制边缘端的上下文规模。对于小模型或规则模板部署，这种压缩显著降低了上下文负担。本项目已沿这一思路训练并导出了一款端侧教学解释小模型，作为大模型解释路径在边缘设备上的轻量实现，其蒸馏过程与初步评测见第六章。")]
 
 #par[#text("为了在不同错误情境下选择恰当的工具，系统先把具体错误归入若干错误族：同网络短路归入短路类，节点接错、孔位接错与引脚悬空归入接线错误类，极性接反归入极性错误类，缺少限流电阻归入保护缺失类，缺元件或缺引脚归入电路不完整类。每个错误族对应一份工具白名单：短路场景调用网表追踪、板型查询、安全规则查询与热力图叠加，接线错误调用板型查询与网表追踪，极性错误调用器件手册查询，概念问答则启用教学概念查询。智能体据此动态选择工具，而不是把所有技能、知识与历史一并塞入上下文。")]
 
@@ -456,7 +460,7 @@
 
 = #text("第六章 Intel DK-2500 边缘部署与异构性能")
 
-#par[#text("前面几章描述了系统“做什么”，本章关注它“在哪里运行、跑得如何”。LabGuardian 面向课堂现场部署，需要在不依赖云端的条件下完成视觉推理与智能诊断。本章先给出本地与容器化部署方式，再说明系统如何利用 Intel DK-2500 开发板的 CPU、iGPU 与 NPU 异构资源进行分工，并以板端实测的延迟、吞吐与功耗数据加以验证，最后讨论运行可观测性与降级策略。")]
+#par[#text("前面几章描述了系统“做什么”，本章关注它“在哪里运行、跑得如何”。LabGuardian 面向课堂现场部署，需要在不依赖云端的条件下完成视觉推理与智能诊断。本章先给出本地与容器化部署方式，再说明系统如何利用 Intel DK-2500 开发板的 CPU、iGPU 与 NPU 异构资源进行分工，并以板端实测的延迟、吞吐与功耗数据加以验证，再讨论运行可观测性与降级策略，最后介绍面向解释环节的端侧小模型蒸馏与初步评测。")]
 
 == #text("6.1 本地运行与容器化部署")
 
@@ -517,6 +521,32 @@
 
 #par[#text("实验教学系统必须具备降级能力。视觉模型缺失时，全图引脚检测输出“不可用”占位；校准失败时，孔位映射使用合成网格回退并标记为低可信；拓扑分类器失败时，场景标签留空并跳过故障案例检索；遥测字段不可用时采样器返回空值而不阻塞主业务；智能体没有可用大模型时仍用确定性模板生成回答。这种“失败放行”或“失败拒止”策略既避免系统因单个模块不可用而整体崩溃，也防止错误默认值污染诊断结论。")]
 
+== #text("6.5 端侧教学解释小模型的蒸馏与初步评测")
+
+#par[#text("第五章的诊断智能体在没有可用大模型时退回确定性模板，而在具备算力时则由大模型承担“把结构化诊断改写为流畅讲解”的表达环节。为使这一环节能够脱离云端、在边缘设备上独立运行，本项目按双教师检索增强蒸馏（RAD）路线训练了一款面向教学问答的端侧小模型，并完成了 OpenVINO INT4 导出与初步评测，作为大模型解释路径在板端的轻量替身。")]
+
+#par[#text("蒸馏数据并非由教师模型自由生成，而是约束在系统已固化的结构化证据之上：以本地部署的 Qwen3-32B 与云端的 DeepSeek-V3 构成双教师，在同一份冻结证据上分别作答，再据此构建监督微调数据，从而把教师的语言能力与系统可验证的事实绑定，抑制教师自身幻觉被放大的风险。学生模型以 Qwen2.5-1.5B-Instruct 为基座，先进行低秩微调（LoRA），再将增量权重合并为完整模型，最后导出为 OpenVINO INT4 中间表示以贴合板端的内存与算力约束。合并后的完整学生模型约 3.1 GB，导出后的 INT4 模型约 0.88 GB；相比仅作为质量上限参考的 4B 级教师模型，1.5B 学生模型的部署门槛明显更低，更契合 DK-2500 等边缘平台的约束。导出后的 INT4 模型目录可随项目代码与 OpenVINO 运行时一并拷贝至板端，在板端通过环境变量将解释环节切换到 OpenVINO GenAI 文本生成后端并指定模型目录即可运行，全程无需外网。")]
+
+#par[#text("为验证“蒸馏→导出→端侧运行”链路是否真正可用，项目在同一台开发机上分别以 CPU 与 GPU 运行导出后的 INT4 学生模型，对前五道典型模拟电路问题进行小规模冒烟评测，两组实验采用相同题集与相同的生成长度上限（约 192 个 token）。如下表所示，GPU 路径单题平均生成时延约为 CPU 的一半，更适合作为本地批量评测与演示路径，CPU 路径则可作为无独立显卡时的功能验证与兜底。")]
+
+#figure(
+  table(
+    columns: (1fr, 0.7fr, 1fr, 1.2fr, 2.4fr),
+    inset: 6pt,
+    stroke: 0.5pt,
+    [#text("运行设备")],
+    [#text("题数")],
+    [#text("加载时间")],
+    [#text("平均生成时延")],
+    [#text("观察")],
+    [#text("CPU")], [#text("5")], [#text("4.03 s")], [#text("9.49 s/题")], [#text("可稳定生成，但单题耗时偏长，适合功能验证与兜底路径")],
+    [#text("GPU")], [#text("5")], [#text("8.14 s")], [#text("4.97 s/题")], [#text("单题生成明显更快，适合本地批量评测与演示路径")],
+  ),
+  caption: [蒸馏后学生模型在开发机上的 OpenVINO INT4 本地评测（相同题集与相同生成长度上限，GPU 平均生成时延约为 CPU 的一半）],
+) <fig:student-runtime>
+
+#par[#text("需要说明的是，上述评测在开发机而非 DK-2500 上完成，且仅覆盖五道题的冒烟规模，因此结论是“链路已打通、初步可用”，而非最终的课堂量产结论。学生模型在板端的真实延迟、资源占用与质量上界，仍有待迁移至 DK-2500 后，结合 CPU、iGPU、NPU 的协同进一步实测；其回答质量的具体边界见 7.2 节，迁移与质量对齐计划见 7.5 节。")]
+
 #pagebreak()
 
 = #text("第七章 完成情况、应用价值与展望")
@@ -535,6 +565,7 @@
 - #text("参考比较已基于逻辑参考电路与拓扑感知的图比较输出结构化诊断报告。")
 - #text("诊断智能体已具备运行证据、上下文包、错误族路由、确定性工具、推理—行动循环、回答验证与回答修复分支。")
 - #text("Web 交互端已完成单工位诊断界面，支持上传、事实链展示、诊断卡片、智能体对话与人工重算。")
+- #text("面向解释环节的端侧教学小模型已按双教师蒸馏路线完成训练、权重合并与 OpenVINO INT4 导出，并在开发机上完成 CPU/GPU 初步评测（GPU 单题平均生成时延约 4.97 秒）。")
 
 #par[#text("本阶段聚焦面包板电路的结构化诊断，已贯通“图像输入→元件与引脚识别→孔位映射→网表生成→参考比较→诊断解释”的主链路。面向“面包板原型验证→PCB 成品制造”的全周期教学闭环仍具拓展价值，但 PCB 自动光学检测、视觉大模型微观诊断与热力图等能力尚未纳入当前主链路。")]
 
@@ -578,6 +609,8 @@
 
 #par[#text("智能体的质量保障不止于“回答是否像人话”，更检查它是否遵守证据约束：为每个错误族构造标准用例，验证被调用的工具是否在白名单内、调用顺序是否合规、回答是否至少包含一个当前错误类型或证据引用、高风险场景是否优先提醒断电与短路复查；对概念问答与混合意图，则检查检索源是否符合约定，并要求错误场景命中率与旧检索回退率为零。")]
 
+#par[#text("针对前述端侧教学解释小模型（见 6.5 节），项目也进行了小规模人工审阅。从积极面看，学生模型已具备“能加载、能生成、能围绕模拟电路问题作答”的基本能力：在 RC 时间常数、共射极放大器旁路电容作用等概念题上，回答能够引用上下文中的关键术语；在实验指导类问题上也能给出分点式步骤。但审阅同样暴露出明显短板：部分回答存在模板化与重复表述；在诊断类问题上仍会出现概念性错误，例如把晶体管集电极—发射极电压接近电源电压的状态（实为截止）误判为饱和；受生成长度限制时，回答偶尔在“引用依据”处提前截断。因此本报告将其定位为“已完成部署与初步效果验证的学生模型基线”，而非最终定版的课堂量产模型；后续需扩大题集、引入评分模型，并在教师模型、学生模型与确定性模板三条路径间做系统的定量对比。")]
+
 #pagebreak()
 
 == #text("7.3 应用价值")
@@ -600,7 +633,7 @@
 
 #par[#text("系统的主要风险集中在四个方面。视觉识别面临遮挡、反光、拍摄角度、类别不平衡与关键点误差，应对方式是持续扩充真实样本、对低置信与多视图冲突样本建立人工复核、并把决定性视图与吸附距离可视化到交互端。拓扑比较依赖参考电路与端口标注，定义不准或标注缺失可能导致误判，应对方式是为参考电路建立审查流程、运行前强制检查电源轨与必要端口、并提供网表比较调试接口供教师验证。")]
 
-#par[#text("智能体与知识检索的风险是错误场景检索、旧知识源污染与安全提示缺失，已通过合法源清单、禁用源清单、训练部署一致性约束与失败拒止机制加以控制，后续应持续以标准评测集监控错误场景命中率、旧检索回退率与回答证据覆盖率。边缘部署的风险包括模型体积、推理延迟、设备兼容与驱动稳定性，应对方式是分层构建镜像、导出并校验视觉模型、记录各阶段延迟与峰值内存、对遥测采样器采用防御式设计。交互端则需避免把原始数据直接抛给学生，应分层隐藏高级修正入口，让学生优先看到“哪里错、为什么、怎么改”，对低置信结果明确提示需人工确认。")]
+#par[#text("智能体与知识检索的风险是错误场景检索、旧知识源污染与安全提示缺失，已通过合法源清单、禁用源清单、训练部署一致性约束与失败拒止机制加以控制，后续应持续以标准评测集监控错误场景命中率、旧检索回退率与回答证据覆盖率。边缘部署的风险包括模型体积、推理延迟、设备兼容与驱动稳定性，应对方式是分层构建镜像、导出并校验视觉模型、记录各阶段延迟与峰值内存、对遥测采样器采用防御式设计。交互端则需避免把原始数据直接抛给学生，应分层隐藏高级修正入口，让学生优先看到“哪里错、为什么、怎么改”，对低置信结果明确提示需人工确认。此外，面向解释环节的端侧教学小模型虽已按双教师路线完成首轮落地，但目前仅完成小规模冒烟与人工审阅，尚未形成大题量、统一评分标准的定量对比，存在以小样本结论高估其课堂可用性的风险，需在扩大评测规模并引入评分模型后再下结论。")]
 
 #par[#text("在上述风险控制之上，后续改进按下表分阶段推进：")]
 
@@ -621,6 +654,9 @@
     [#text("中期")],
     [#text("扩展参考电路描述与教学知识库")],
     [#text("更多教学模板、器件手册、故障案例与电路知识库条目")],
+    [#text("中期")],
+    [#text("将端侧教学解释小模型迁移至 DK-2500 并完善质量对齐")],
+    [#text("板端 CPU/iGPU/NPU 协同延迟与资源占用、引入评分模型的自动筛样、教师/学生/模板三路定量对比")],
     [#text("后期")],
     [#text("引入更强的多视角融合与低置信交互")],
     [#text("遮挡样本对照测试、可视化证据叠加、标定误差统计")],
