@@ -39,14 +39,16 @@
   it
 }
 // 三线表描边：n 为表格总行数。表头上方与表底各一条粗线，表头下方一条细线，无竖线与内部横线。
+// 注：相邻单元格共享的边以"下方单元格的 top"为准，故表头细线画在首个数据行（y==1）的 top 上，
+// 且其余各边不写 0pt 以免覆盖该细线。
 #let tl(n) = (x, y) => (
-  top: if y == 0 { 0.9pt } else { 0pt },
-  bottom: if y == 0 { 0.5pt } else if y == n - 1 { 0.9pt } else { 0pt },
+  top: if y == 0 { 0.9pt } else if y == 1 { 0.5pt },
+  bottom: if y == n - 1 { 0.9pt },
 )
 // 无表头键值表的三线表：仅表顶、表底两条粗线。
 #let tl2(n) = (x, y) => (
-  top: if y == 0 { 0.9pt } else { 0pt },
-  bottom: if y == n - 1 { 0.9pt } else { 0pt },
+  top: if y == 0 { 0.9pt },
+  bottom: if y == n - 1 { 0.9pt },
 )
 // 表格标题置于表上方；图片标题保持在图下方。两者均居中、字号小于正文。
 #show figure.where(kind: table): set figure.caption(position: top)
