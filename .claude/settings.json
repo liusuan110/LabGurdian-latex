@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(echo \"EXIT_$?\")",
+      "PowerShell($t = \\(Get-Command typst -ErrorAction SilentlyContinue\\); if \\($t\\) { typst compile LabGuardian.typ; \"EXIT=$LASTEXITCODE\" } else { \"no-typst-cli\" })",
+      "Bash(python -c ' *)"
+    ]
+  }
+}
