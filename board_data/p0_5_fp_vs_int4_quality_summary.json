@@ -1,0 +1,42 @@
+{
+  "fp": {
+    "avg_score_pct": 64.44,
+    "pass_rate_pct": 80.0,
+    "full_score_rate_pct": 26.67,
+    "avg_latency_s": 5.8
+  },
+  "int4": {
+    "avg_score_pct": 71.11,
+    "pass_rate_pct": 80.0,
+    "full_score_rate_pct": 40.0,
+    "avg_latency_s": 7.73
+  },
+  "delta_fp_minus_int4": {
+    "avg_score_pct": -6.67,
+    "pass_rate_pct": 0.0,
+    "full_score_rate_pct": -13.33,
+    "avg_latency_s": -1.93
+  },
+  "by_intent": {
+    "concept_tutor": {
+      "fp_avg_score_pct": 58.33,
+      "int4_avg_score_pct": 83.33,
+      "delta_fp_minus_int4_pp": -25.0
+    },
+    "diagnostic": {
+      "fp_avg_score_pct": 71.79,
+      "int4_avg_score_pct": 58.97,
+      "delta_fp_minus_int4_pp": 12.82
+    },
+    "lab_guidance": {
+      "fp_avg_score_pct": 66.67,
+      "int4_avg_score_pct": 73.33,
+      "delta_fp_minus_int4_pp": -6.66
+    },
+    "mixed": {
+      "fp_avg_score_pct": 50.0,
+      "int4_avg_score_pct": 83.33,
+      "delta_fp_minus_int4_pp": -33.33
+    }
+  }
+}
