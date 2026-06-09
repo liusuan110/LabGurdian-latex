@@ -41,12 +41,12 @@
 #let 参赛学校        = ""
 
 #let 中文摘要 = [
-  针对高校电子实验中“原理图正确但实物接错”难以发现、师生比偏高、教学诊断需可解释且安全的痛点，本文提出 LabGuardian——一个运行于英特尔边缘平台的神经—符号解耦电路实验诊断系统。系统不让大模型直接“看图判错”，而是以多视角面包板图像为输入，经自建引脚级数据集训练的关键点模型、孔位吸附与板型导通规则重构引脚级电气网表；由确定性图比对算法承担对错判断并输出可审计的结构化错误事实，再由智能体在检索契约限定的证据范围内生成自然语言解释，并以不可绕过的校验器拦截无依据陈述。教学解释模型经双教师蒸馏与 INT4 量化后部署于 Intel DK-2500，借助 NPU、iGPU 与 CPU 的异构分工实现低功耗本地推理。实验表明，NPU INT8 视觉模型达到 13.37 ms 延迟与 74.7 img/s 吞吐，端侧 INT4 学生模型约 0.88 GB、约 23 tok/s；检索契约使同一小模型由 0/6 场景无法定位故障提升至 6/6 场景正确接地，系统可在 8 GB 内存边缘设备上以约 10 W 完成诊断与解释。
+  针对高校电子实验中“原理图正确但实物接错”难以发现、师生比偏高、教学诊断需可解释且安全的痛点，本文提出 LabGuardian——一个运行于英特尔边缘平台的神经—符号解耦电路实验诊断系统。系统不让大模型直接“看图判错”，而是以多视角面包板图像为输入，经自建引脚级数据集训练的关键点模型、孔位吸附与板型导通规则重构引脚级电气网表；由确定性图比对算法承担对错判断并输出可审计的结构化错误事实，再由智能体在检索契约限定的证据范围内生成自然语言解释，并以不可绕过的校验器拦截无依据陈述。教学解释模型经双教师蒸馏与 INT4 量化后部署于 Intel DK-2500，借助 NPU、iGPU 与 CPU 的异构分工实现低功耗本地推理。实验表明，NPU INT8 视觉模型达到 13.37 ms 延迟与 74.7 img/s 吞吐，端侧 INT4 学生模型约 0.88 GB、约 23 tok/s；检索契约使同一小模型由 0/6 场景无法定位故障提升至 6/6 场景正确接地，系统可在 8 GB 内存边缘设备上、以约 10 W 量级的推理工作功耗（空载约 4.4 W）完成诊断与解释。
 ]
 #let 中文关键词 = ("面包板电路诊断", "神经—符号", "检索契约", "知识蒸馏", "边缘智能")
 
 #let 英文摘要 = [
-  To address "schematic-correct but wrongly-wired" breadboard circuits, high student-to-teacher ratios, and the need for explainable and safe feedback in electronics laboratories, this paper presents LabGuardian, a neuro-symbolic circuit-diagnosis system running on an Intel edge platform. Instead of asking a large model to directly judge an image, LabGuardian reconstructs a pin-level electrical netlist from noisy breadboard images using a self-built pin-level dataset, keypoint detection, hole snapping, and breadboard connectivity rules. A deterministic graph-comparison engine makes the correctness judgement and emits auditable structured error facts; an agent then generates explanations strictly within a retrieval contract, while an unbypassable verifier rejects ungrounded statements. The teaching-explanation model is produced by dual-teacher distillation and INT4 quantization, and is deployed on the Intel DK-2500 through heterogeneous NPU/iGPU/CPU scheduling. Experiments show that the NPU INT8 vision model reaches 13.37 ms latency and 74.7 img/s throughput, while the 0.88 GB INT4 student model runs at about 23 tok/s. With the same small model, the retrieval contract improves fault grounding from 0/6 to 6/6 demo scenarios, enabling diagnosis and explanation at about 10 W on an 8 GB edge device.
+  To address "schematic-correct but wrongly-wired" breadboard circuits, high student-to-teacher ratios, and the need for explainable and safe feedback in electronics laboratories, this paper presents LabGuardian, a neuro-symbolic circuit-diagnosis system running on an Intel edge platform. Instead of asking a large model to directly judge an image, LabGuardian reconstructs a pin-level electrical netlist from noisy breadboard images using a self-built pin-level dataset, keypoint detection, hole snapping, and breadboard connectivity rules. A deterministic graph-comparison engine makes the correctness judgement and emits auditable structured error facts; an agent then generates explanations strictly within a retrieval contract, while an unbypassable verifier rejects ungrounded statements. The teaching-explanation model is produced by dual-teacher distillation and INT4 quantization, and is deployed on the Intel DK-2500 through heterogeneous NPU/iGPU/CPU scheduling. Experiments show that the NPU INT8 vision model reaches 13.37 ms latency and 74.7 img/s throughput, while the 0.88 GB INT4 student model runs at about 23 tok/s. With the same small model, the retrieval contract improves fault grounding from 0/6 to 6/6 demo scenarios, enabling diagnosis and explanation at an inference power on the order of 10 W (idle ~4.4 W) on an 8 GB edge device.
 ]
 #let 英文关键词 = ("breadboard circuit diagnosis", "neuro-symbolic", "retrieval contract", "knowledge distillation", "edge intelligence")
 
@@ -760,11 +760,11 @@ DK-2500 搭载 Intel Core Ultra 5 225U，具备同时调度 CPU、iGPU、NPU 三
 
 == 异构性能实测与能效
 
-为量化上述分工，项目以 turbostat 按 0.25 秒间隔采样 RAPL 能量计，并在板端以输入分辨率 960（与训练及部署一致）单进程串行采集 60 至 1153 次推理统计，测得 YOLOv8s-pose 关键点检测在 CPU、iGPU、NPU 三种单元上的延迟、吞吐与功耗。其功耗时序如#ref(<fig:power-ts>)所示：NPU 推理期间 CPU 核心与 iGPU 功率曲线全程贴近空闲基线（约 4.42 W），说明 NPU 几乎不占用其他单元资源，为“NPU 负责视觉、iGPU 负责诊断、CPU 负责控制”的三路并行提供了硬件层面的可行性。
+为量化上述分工，项目以 turbostat 按 0.25 秒间隔采样 RAPL 能量计，并在板端以输入分辨率 960（与训练及部署一致）单进程串行采集 60 至 1153 次推理统计，测得 YOLOv8s-pose 关键点检测在 CPU、iGPU、NPU 三种单元上的延迟、吞吐与功耗。其功耗时序如#ref(<fig:power-ts>)所示：NPU 推理期间 CPU 核心与 iGPU 功率曲线全程贴近空闲基线（约 4.42 W），说明 NPU 几乎不占用其他单元资源，为“NPU 负责视觉、iGPU 负责诊断、CPU 负责控制”的三路异构分工提供了硬件层面的可行性（本节功耗为逐单元串行采集，端到端并行加速比留待后续实测）。
 
 #figure(
   image("pictures/cadx/power_timeseries.pdf", width: 88%),
-  caption: [YOLOv8s-pose INT8 在 DK-2500 上的 RAPL 功耗时序：三段分别对应 CPU/iGPU/NPU 各持续 15 秒的工作态；NPU 工作时 CPU 与 iGPU 全程贴近空闲基线，是实现真正异构并行的关键],
+  caption: [YOLOv8s-pose INT8 在 DK-2500 上的 RAPL 功耗时序：三段分别对应 CPU/iGPU/NPU 各持续 15 秒的工作态；NPU 工作时 CPU 与 iGPU 全程贴近空闲基线，是三单元异构分工、互不争用的硬件前提],
 ) <fig:power-ts>
 
 各配置的详细指标如#ref(<tab:hetero>)所示。NPU INT8 在所有维度均最优：延迟 13.37 ms、吞吐 74.7 img/s、P99 抖动仅 15.61 ms，满足课堂实时视频流需求。INT8 量化通过在 144 张校准图上完成的训练后量化得到，模型从 22 MB 压缩至 11 MB，NPU 吞吐不降反升，由 60.4 提升至 74.7 img/s。
