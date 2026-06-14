@@ -40,9 +40,6 @@ def yolo():
 
     fig, ax = plt.subplots(figsize=(8.5, 4.2), dpi=200)
     lab = {"CPU_workload": "CPU INT8", "GPU_workload": "iGPU INT8", "NPU_workload": "NPU INT8"}
-    for ph in meta["phases"]:
-        if "workload" in ph["name"]:
-            ax.axvspan(ph["start_s"], ph["end_s"], color=BAND, zorder=0)
     ymax = max(pkg) * 1.15
     ax.plot(t, pkg, label="整封装(总)", color=INK, linewidth=2.0, zorder=3)
     ax.plot(t, cor, label="CPU 核心", color=G1, linewidth=1.3, linestyle="--", zorder=2)
@@ -80,8 +77,6 @@ def student():
     ymax = max(pkg) * 1.12
     zh = {"idle": "空载", "inference": "推理", "cooldown": "冷却"}
     for name, t0, t1 in sp:
-        if name == "inference":
-            ax.axvspan(t0, t1, color=BAND, zorder=0)
         if name in zh and (t1 - t0) > 1:
             ax.text((t0 + t1) / 2, ymax * 0.05, zh[name], ha="center", va="bottom", fontsize=9, color="#444444")
     ax.plot(t, pkg, label="整封装功率", color=INK, linewidth=1.8, zorder=3)

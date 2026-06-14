@@ -192,10 +192,11 @@
 // 三线表：顶线 1pt + 表头底线 0.5pt + 底线 1pt，无竖线
 #let 三线表(columns: (), align-cells: auto, header: (), rows: ()) = {
   let n = rows.len()
+  set text(size: 小五)
   table(
     columns: columns,
     align: align-cells,
-    inset: (x: 6pt, y: 4pt),
+    inset: (x: 5pt, y: 4pt),
     stroke: (x, y) => {
       if y == 0 { (top: 1pt, bottom: 0.5pt) }
       else if y == n { (bottom: 1pt) }
