@@ -51,9 +51,11 @@ def fig_arch():
         ("Agent 与知识解释层","上下文编排 · 工具调用 · 检索契约 · 校验器（唯一接触大模型）", "emph"),
         ("基础支撑层",        "异步任务 · 缓存 · 容器化 · 单元/契约测试",        "data"),
     ]
-    fig, ax = plt.subplots(figsize=(10.2, 5.0), dpi=200)
-    ax.set_xlim(0, 11.0); ax.set_ylim(0, 5.6); ax.axis("off")
-    x0, x1 = 1.55, 9.6; bh = 0.74; gap = 0.92
+    # 收窄留白、加宽内容栏并放大字号：图原生宽度更接近版心，Typst 下采样更轻，
+    # 落到纸面的字号从 ~5pt 提升到 ~8pt（模块串）/ ~9.5pt（层名），不再显著小于正文。
+    fig, ax = plt.subplots(figsize=(9.0, 4.3), dpi=200)
+    ax.set_xlim(0, 10.7); ax.set_ylim(0, 5.6); ax.axis("off")
+    x0, x1 = 1.05, 10.05; bh = 0.74; gap = 0.92
     ytop = 5.0
     ys = [ytop - i*gap for i in range(6)]
     for (name, mods, kind), y in zip(layers, ys):
@@ -61,21 +63,21 @@ def fig_arch():
         ax.add_patch(FancyBboxPatch((x0, y - bh/2), x1 - x0, bh,
                      boxstyle="round,pad=0.02,rounding_size=0.10",
                      fc=fc, ec=ec, lw=lw, zorder=3))
-        ax.plot([x0 + 2.55, x0 + 2.55], [y - bh/2 + 0.08, y + bh/2 - 0.08],
+        ax.plot([x0 + 2.65, x0 + 2.65], [y - bh/2 + 0.08, y + bh/2 - 0.08],
                 color=GRAY, lw=0.8, zorder=4)
-        ax.text(x0 + 1.28, y, name, ha="center", va="center", fontsize=10.2,
+        ax.text(x0 + 1.30, y, name, ha="center", va="center", fontsize=14,
                 fontweight="bold", color=INK, zorder=4)
-        ax.text(x0 + 2.75, y, mods, ha="left", va="center", fontsize=8.8,
+        ax.text(x0 + 2.85, y, mods, ha="left", va="center", fontsize=12,
                 color=INK, zorder=4)
     # 两侧方向箭头
-    ax.add_patch(FancyArrowPatch((0.95, ys[0] + bh/2), (0.95, ys[-1] - bh/2),
+    ax.add_patch(FancyArrowPatch((0.62, ys[0] + bh/2), (0.62, ys[-1] - bh/2),
                  arrowstyle="-|>", color=INK, lw=1.2, mutation_scale=12, zorder=2))
-    ax.text(0.62, (ys[0]+ys[-1])/2, "上层发起调用", rotation=90, ha="center",
-            va="center", fontsize=8.6, style="italic", color=INK)
-    ax.add_patch(FancyArrowPatch((10.2, ys[-1] - bh/2), (10.2, ys[0] + bh/2),
+    ax.text(0.30, (ys[0]+ys[-1])/2, "上层发起调用", rotation=90, ha="center",
+            va="center", fontsize=12, style="italic", color=INK)
+    ax.add_patch(FancyArrowPatch((10.35, ys[-1] - bh/2), (10.35, ys[0] + bh/2),
                  arrowstyle="-|>", color=INK, lw=1.2, mutation_scale=12, zorder=2))
-    ax.text(10.55, (ys[0]+ys[-1])/2, "逐层向上提供可证伪事实", rotation=90, ha="center",
-            va="center", fontsize=8.6, style="italic", color=INK)
+    ax.text(10.57, (ys[0]+ys[-1])/2, "逐层向上提供可证伪事实", rotation=90, ha="center",
+            va="center", fontsize=12, style="italic", color=INK)
     fig.tight_layout(pad=0.3)
     fig.savefig("pictures/cadx/arch.pdf", bbox_inches="tight"); plt.close(fig)
     print("ok arch.pdf")
