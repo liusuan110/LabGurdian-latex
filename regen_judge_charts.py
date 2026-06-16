@@ -98,7 +98,7 @@ def fig_four_model():
         a2.text(i, v + 2.5, f"{v:.0f}", ha="center", va="bottom",
                 fontsize=9.5, color=INK, fontweight="bold")
 
-    fig.suptitle("P0 四模型 LLM-Judge 自动评分对比  |  30题  |  5维1-5分量表",
+    fig.suptitle("四模型 LLM-Judge 自动评分对比  |  30题  |  5维1-5分量表",
                  fontsize=11.5, fontweight="bold", color=INK, y=1.01)
     fig.tight_layout(h_pad=2.5)
     fig.savefig(f"{BOARD}/p0_four_model_judge.png", bbox_inches="tight",
@@ -223,7 +223,7 @@ def fig_fp_vs_int4():
                 fontweight="bold",
                     clip_on=False, zorder=10)
 
-    fig.suptitle("P0.5 量化消融: FP vs INT4  |  同一题集 · 同一评委 · 同一约束",
+    fig.suptitle("FP vs INT4 量化对比  |  同一题集 · 同一评委 · 同一约束",
                  fontsize=10, fontweight="bold", color=INK, y=1.07)
     fig.tight_layout(w_pad=3.5)
     fig.savefig(f"{BOARD}/p0_5_fp_vs_int4_judge.png", bbox_inches="tight",
