@@ -48,7 +48,7 @@
   margin: (top: 2.7cm, bottom: 2.0cm, left: 2.3cm, right: 2.3cm),
   header: page-header,
   header-ascent: 9pt,
-  footer: page-footer,
+  footer: none,
 )
 #set text(font: body-font, size: body-size, lang: "en")
 #set par(first-line-indent: (amount: 1.5em, all: true), leading: 0.86em, spacing: 0.55em, justify: true)
@@ -101,43 +101,46 @@
 #{
   set align(center)
   set par(first-line-indent: 0pt, leading: 1em)
-  v(0.3cm)
+  v(0.6cm)
   text(font: serif-font, size: four)[#contest-year Intel Cup Undergraduate Electronic Design Contest]
   v(0.1em)
-  text(font: serif-font, size: four)[Embedded System Design Invitational Contest]
-  v(0.7cm)
-  text(font: cover-font, size: 28pt, weight: "semibold")[Final Report]
-  v(0.6cm)
-  image("assets/esdc_logo.jpg", width: 34%)
+  text(font: serif-font, size: four)[#"- Embedded System Design Invitational Contest"]
+  v(1.0cm)
+  text(font: cover-font, size: 30pt, weight: "semibold")[Project Design Report]
+  v(0.1em)
+  text(font: cover-font, size: 30pt)[Final Report]
   v(0.8cm)
+  image("assets/esdc_logo.jpg", width: 38%)
+  v(1.4cm)
   grid(
     columns: (auto, 1fr),
     align: (left + bottom, left + bottom),
     column-gutter: 0.3em,
-    text(font: cover-font, size: three, weight: "semibold")[Title: ],
+    text(font: cover-font, size: two)[Title: ],
     box(width: 100%, stroke: (bottom: 1pt), inset: (bottom: 4pt))[
       #set par(first-line-indent: 0pt, leading: 0.9em, justify: false)
-      #align(center)[#text(font: cover-font, size: four, weight: "semibold")[#report-title]]
+      #align(center)[#text(font: cover-font, size: small-four, weight: "semibold")[#report-title]]
     ],
   )
-  v(1.0cm)
+  v(1.5cm)
   let info-row(label, value) = grid(
     columns: (auto, 7.6cm),
     align: (left + bottom, center + bottom),
     column-gutter: 0.3em,
-    text(font: title-font, size: three)[#label: ],
-    box(width: 100%, stroke: (bottom: 1pt), inset: (bottom: 3pt))[#text(font: title-font, size: three)[#value]],
+    text(font: cover-font, size: three)[#label: ],
+    box(width: 100%, stroke: (bottom: 1pt), inset: (bottom: 3pt))[#text(font: cover-font, size: three)[#value]],
   )
   block(width: 12.5cm)[
     #info-row("Student Name", student-name)
-    #v(0.55cm)
+    #v(0.8cm)
     #info-row("Advisor", advisor)
-    #v(0.55cm)
+    #v(0.8cm)
     #info-row("University", university)
   ]
 }
 
 #pagebreak()
+#set page(footer: page-footer)
 #counter(page).update(1)
 
 #align(center)[
