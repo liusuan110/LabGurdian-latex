@@ -15,6 +15,7 @@
 #let body-font = ("Times New Roman", "SimSun", "Songti SC", "Source Han Serif SC")
 #let title-font = ("Times New Roman", "SimHei", "Heiti SC", "Noto Sans SC")
 #let serif-font = ("Times New Roman", "STSong")
+#let cover-font = ("Cambria", "Georgia", "Times New Roman")
 
 #let small-five = 9pt
 #let body-size = 10.5pt
@@ -105,7 +106,7 @@
   v(0.1em)
   text(font: serif-font, size: four)[Embedded System Design Invitational Contest]
   v(0.7cm)
-  text(font: serif-font, size: 30pt, weight: "bold")[Final Report]
+  text(font: cover-font, size: 28pt, weight: "semibold")[Final Report]
   v(0.6cm)
   image("assets/esdc_logo.jpg", width: 34%)
   v(0.8cm)
@@ -113,9 +114,10 @@
     columns: (auto, 1fr),
     align: (left + bottom, left + bottom),
     column-gutter: 0.3em,
-    text(font: title-font, size: two, weight: "bold")[Title: ],
+    text(font: cover-font, size: three, weight: "semibold")[Title: ],
     box(width: 100%, stroke: (bottom: 1pt), inset: (bottom: 4pt))[
-      #align(center)[#text(font: title-font, size: three, weight: "bold")[#report-title]]
+      #set par(first-line-indent: 0pt, leading: 0.9em, justify: false)
+      #align(center)[#text(font: cover-font, size: four, weight: "semibold")[#report-title]]
     ],
   )
   v(1.0cm)
