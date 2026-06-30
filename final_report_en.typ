@@ -8,9 +8,9 @@
 #let contest-year = "2026"
 #let report-title = "LabGuardian: An Intelligent Teaching Assistant System Based on Edge AI"
 #let header-title = "LabGuardian: Edge-AI Teaching Assistant"
-#let student-name = ""
-#let advisor = ""
-#let university = ""
+#let student-name = "Zhang Xinran, Liu Su'an, Ruan Jiali"
+#let advisor = "Cheng Kun"
+#let university = "Beijing University of Posts and Telecommunications"
 
 #let body-font = ("Times New Roman", "SimSun", "Songti SC", "Source Han Serif SC")
 #let title-font = ("Times New Roman", "SimHei", "Heiti SC", "Noto Sans SC")
@@ -123,20 +123,28 @@
     ],
   )
   v(1.5cm)
-  let info-row(label, value) = grid(
-    columns: (auto, 7.6cm),
-    align: (left + bottom, center + bottom),
-    column-gutter: 0.3em,
-    text(font: cover-font, size: three)[#label: ],
-    box(width: 100%, stroke: (bottom: 1pt), inset: (bottom: 3pt))[#text(font: cover-font, size: three)[#value]],
+  // Cover information rows: label right-aligned, value centered on a longer underline.
+  grid(
+    columns: (auto, 1fr),
+    align: (right + bottom, center + bottom),
+    column-gutter: 0.5em,
+    row-gutter: 0.8cm,
+    text(font: cover-font, size: three)[Student Name: ],
+    box(width: 100%, stroke: (bottom: 1pt), inset: (bottom: 3pt))[
+      #set par(first-line-indent: 0pt, justify: false)
+      #align(center)[#text(font: cover-font, size: four)[#student-name]]
+    ],
+    text(font: cover-font, size: three)[Advisor: ],
+    box(width: 100%, stroke: (bottom: 1pt), inset: (bottom: 3pt))[
+      #set par(first-line-indent: 0pt, justify: false)
+      #align(center)[#text(font: cover-font, size: four)[#advisor]]
+    ],
+    text(font: cover-font, size: three)[University: ],
+    box(width: 100%, stroke: (bottom: 1pt), inset: (bottom: 3pt))[
+      #set par(first-line-indent: 0pt, justify: false)
+      #align(center)[#text(font: cover-font, size: four)[#university]]
+    ],
   )
-  block(width: 12.5cm)[
-    #info-row("Student Name", student-name)
-    #v(0.8cm)
-    #info-row("Advisor", advisor)
-    #v(0.8cm)
-    #info-row("University", university)
-  ]
 }
 
 #pagebreak()
@@ -156,7 +164,10 @@
   The key design is a neuro-symbolic fact chain: image keypoints identify component pins, breadboard rules map pins to holes and conductive nodes, graph comparison produces structured error codes with evidence, and an evidence-constrained explanation model rewrites those facts into repair guidance. The implementation targets the Intel DK-2500 edge platform. Vision runs on the NPU, explanation on the iGPU, and graph matching, retrieval, telemetry, and orchestration on the CPU, allowing local operation within an 8 GB memory budget.
 ]
 #v(0.3em)
-#text(font: title-font, size: small-four, weight: "bold")[Key words: ]#text(font: serif-font, size: body-size)[breadboard wiring diagnosis, edge AI, neuro-symbolic reasoning, auditable explanation, knowledge distillation]
+#text(font: title-font, size: small-four, weight: "bold")[Key words: ]#text(
+  font: serif-font,
+  size: body-size,
+)[breadboard wiring diagnosis, edge AI, neuro-symbolic reasoning, auditable explanation, knowledge distillation]
 
 = Problem and Requirements
 
@@ -248,7 +259,11 @@ The key result is not a single model score but a complete auditable loop from re
       ([Energy], [NPU INT8 incremental power], [About 4.12 W and 114.2 mJ per inference]),
       ([Explanation], [INT4 student model], [About 0.94 GB package and 1.36 GB peak memory]),
       ([Quality], [30-question check], [90.0% overall pass rate; diagnostic guidance needs further work]),
-      ([Reliability], [Evidence boundary], [Model explains only verified facts; unsupported claims are blocked or templated]),
+      (
+        [Reliability],
+        [Evidence boundary],
+        [Model explains only verified facts; unsupported claims are blocked or templated],
+      ),
     ),
   ),
   caption: [Key quantitative evidence retained from the Chinese report.],
