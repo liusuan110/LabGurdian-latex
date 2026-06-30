@@ -374,9 +374,9 @@
 #v(一行)   // 空一行
 // 摘要正文：五号宋体，首行缩进二字，单倍行距
 #block(width: 100%)[
-  #set par(first-line-indent: (amount: 2em, all: true), leading: 1em, justify: true)
+  #set par(first-line-indent: (amount: 0em, all: false), leading: 1em, justify: true)
   #set text(font: 正文字体, size: 五号)
-  #中文摘要
+  #h(2em)#中文摘要
 ]
 #v(一行)   // 空一行
 #关键词行(..中文关键词)
@@ -394,9 +394,9 @@
 ]
 #v(一行)
 #block(width: 100%)[
-  #set par(first-line-indent: (amount: 2em, all: true), leading: 1em, justify: true)
+  #set par(first-line-indent: (amount: 0em, all: false), leading: 1em, justify: true)
   #set text(font: 英文字体, size: 五号)
-  #英文摘要
+  #h(2em)#英文摘要
 ]
 #v(一行)
 #key-words-line(..英文关键词)
