@@ -102,7 +102,7 @@
 
 #set page(
   paper: "a4",
-  margin: (top: 3.1cm, bottom: 2.4cm, left: 2.6cm, right: 2.6cm),
+  margin: (top: 2.54cm, bottom: 2.54cm, left: 3cm, right: 3cm),
   header: 页眉,
   header-ascent: 9pt, // 分隔线落在约 2.78cm 处、logo 顶在约 1.5cm 处，与原模板一致
   footer: none, // 前置部分（封面～目录）不显示页码，正文处再开启
@@ -346,7 +346,7 @@
   text(font: 标题字体, size: 二号, weight: "bold")[参赛作品原创性声明]
 }
 #v(1.0cm)
-#block(width: 100%)[
+#block(width: 100%, inset: (left: 2em))[
   #set par(first-line-indent: (amount: 0em, all: false), leading: 1.6em, justify: true)
   #set text(font: 正文字体, size: 四号)
   #h(2em)本人郑重声明：所呈交的参赛作品报告，是本人和队友独立进行研究工作所取得的成果。除文中已经注明引用的内容外，本论文不包含任何其他个人或集体已经发表或撰写过的作品成果，不侵犯任何第三方的知识产权或其他权利。本人完全意识到本声明的法律结果由本人承担。
