@@ -934,11 +934,50 @@ LoRA 插入位置覆盖Qwen2.5-1.5B-Instruct的注意力层与前馈层线性投
 
 #block[
   #set par(first-line-indent: (amount: 2em, all: true), leading: 1em)
-  *附录 A　源代码与程序清单.* 本作品的完整源代码、知识库与板端部署脚本随作品实物一并提交。后端服务（视觉流水线、确定性图比对、检索约束与智能体编排）、交互前端、知识库（教学场景、故障案例、器件手册、电路知识）、模型蒸馏与评测脚本，以及 DK-2500 板端性能与能耗采集脚本均在其中；关键模块的单元与约定测试见后端测试目录。
+  *附录 A　源代码与程序清单.* 本作品完整源代码随电子附件一并提交，附件包含后端服务、前端交互界面、视觉诊断流水线、知识库、边缘部署说明、配置示例和测试程序。报告正文仅列出主要代码结构与关键程序功能，完整可运行代码以电子附件中的项目目录为准。
 
-  *附录 B　扩展应用系统电路图.* 六类示范教学拓扑（一阶 RC、共射放大、差分对、UA741 反相/积分/加法）的逻辑参考电路定义与对应故障案例随知识库提交，可作为系统扩展到更多课程实验的样例。
+  系统采用前后端分离与模块化流水线架构。后端基于 FastAPI 实现，负责图像输入、视觉识别、引脚级网表重构、确定性图比对、诊断报告生成、检索约束和教学解释编排；前端基于 React、Vite 和 TypeScript 实现，负责面包板图片上传、诊断过程展示、元件/引脚/孔位/网络可视化、错误高亮和教学解释交互。系统后端的核心事实链为 #text(font: 英文字体)[component_id + pin_name + hole_id -> electrical_node_id -> electrical_net_id -> netlist_v2]，即先从图像中识别元件和引脚，再将引脚映射到面包板孔位和导通节点，进一步合并为电气网络，最终形成可用于电路比较的结构化网表。后续诊断、风险判断、界面高亮和教学解释均基于这条结构化事实链展开。
 
-  *附录 C　应用资料与参考文献目录.* 见上节参考文献；器件手册原始资料（UA741、LM324、NE555、S8050 等）随器件手册知识库提交。
+  源码附件建议命名为 #text(font: 英文字体)[LabGuardian_Source_Code.zip]，其中 #text(font: 英文字体)[LabGuardian-Server/] 保存后端服务、诊断流水线、知识库、测试和部署脚本，#text(font: 英文字体)[LabGuardian-web/] 保存前端交互界面源码。附件中保留源码、配置示例、测试样例、说明文档和必要脚本；不包含本地虚拟环境、依赖缓存、运行日志、上传缓存、个人密钥和真实环境变量。较大的模型权重、数据集或量化模型如需单独提交，应在 README 中注明文件名、用途、放置路径和运行方式。
+]
+
+#figure(
+  三线表(
+    columns: (1.15fr, 2.1fr, 3.55fr),
+    align-cells: (center, left, left),
+    header: ([类别], [目录或文件], [功能说明]),
+    rows: (
+      ([后端入口], [app/main.py], [启动 FastAPI 应用，挂载各类 API 路由与服务配置。]),
+      ([API 接口], [app/api/v1/pipeline.py], [提供流水线运行接口，接收面包板图像与参考电路配置，返回结构化诊断结果。]),
+      ([智能体接口], [app/api/v1/angnt.py], [提供教学解释问答接口，接收诊断证据并返回面向学生的说明与建议。]),
+      ([服务层], [app/services/pipeline_service.py], [组织视觉识别、孔位映射、网表构建、图比对和语义分析等阶段的调用。]),
+      ([流水线编排], [app/pipeline/orchestrator.py], [控制 S1 至 S5 各阶段的执行顺序、状态传递、异常处理和运行元数据记录。]),
+      ([组件检测], [app/pipeline/stages/s1_detect.py], [使用俯视图建立元件主实例，生成全局 component_id 与组件类型、封装和边界框信息。]),
+      ([引脚检测], [app/pipeline/stages/s1b_pin_detect.py], [调用整图 YOLO-Pose 检测引脚关键点，并将引脚归属到对应组件。]),
+      ([孔位映射], [app/pipeline/stages/s2_mapping.py], [将引脚关键点映射到面包板 hole_id 与 electrical_node_id，并保留候选孔位和歧义信息。]),
+      ([拓扑构建], [app/pipeline/stages/s3_topology.py], [根据组件、引脚和孔位信息构建拓扑图，导出 netlist_v2 结构化电气网表。]),
+      ([诊断校验], [app/pipeline/stages/s4_validate.py], [调用参考电路比较模块，生成错误码、风险等级、建议动作和证据引用。]),
+      ([语义分析], [app/pipeline/stages/s5_semantic_analysis.py], [把诊断事实整理为教学解释输入，使语言模型只消费已验证证据。]),
+      ([参考电路 DSL], [app/domain/dsl/], [描述和编译参考电路，生成可用于图比对的标准逻辑结构。]),
+      ([确定性图比对], [app/domain/compare/], [在元件-网络图上比较学生电路与参考电路，定位缺失、短路、开路和错接等问题。]),
+      ([知识与智能体], [app/agent/, knowledge/], [构造运行证据、上下文包、工具调用和一致性校验，约束教学解释不越过诊断事实。]),
+      ([前端 API], [src/api/pipeline.ts, src/api/agent.ts], [封装前端对后端流水线和智能体接口的调用。]),
+      ([演示页面], [src/features/demo/DemoPage.tsx], [组织单工位演示主流程，包括图片上传、流水线运行、结果展示和问答交互。]),
+      ([可视化组件], [src/components/BreadboardView.tsx], [展示面包板孔位、元件、网络和错误高亮，使诊断证据可视化。]),
+      ([网表展示], [src/components/NetlistView.tsx], [展示结构化网表、元件引脚与网络连接关系。]),
+      ([阶段时间线], [src/components/StageTimeline.tsx], [展示 S1 至 S5 各阶段执行状态、耗时和中间结果。]),
+      ([类型与工具], [src/types/, src/utils/], [定义前后端共享数据结构，并提供面包板、文件、端口标注和结果转换工具。]),
+      ([测试程序], [tests/], [保存单元测试、回归样例和流水线 smoke tests，用于验证关键模块行为。]),
+    ),
+  ),
+  caption: [LabGuardian 主要程序清单],
+)
+
+#block[
+  #set par(first-line-indent: (amount: 2em, all: true), leading: 1em)
+  运行时，用户在前端上传面包板俯视图并选择参考电路，后端流水线依次完成元件检测、引脚检测、孔位映射、网表重构、确定性图比对和教学解释生成。部署到 Intel DK-2500 平台时，视觉推理主要运行于 NPU，教学解释模型运行于 iGPU，图比对、检索、调度和证据校验运行于 CPU，从而实现弱网络或离线课堂环境下的本地诊断与解释。
+
+  *附录 B　源代码附件下载链接.* 本作品源代码附件文件为 #link("LabGuardian_Source_Code.zip")[#text(font: 英文字体)[LabGuardian_Source_Code.zip]]，与本报告 PDF 放置在同一提交目录下。附件包含 #text(font: 英文字体)[LabGuardian-Server/] 后端源码、#text(font: 英文字体)[LabGuardian-web/] 前端源码、项目 README、配置示例、知识库、测试程序和必要部署脚本；不包含本地虚拟环境、依赖缓存、运行日志、上传缓存、个人密钥和真实环境变量。
 ]
 
 
